@@ -26,7 +26,7 @@ data_root = {'ImageNet': './dataset/ImageNet',
              'Places': './dataset/Places-LT',
              'iNaturalist18': '/checkpoint/bykang/iNaturalist18',
              'CIFAR10': './dataset/',
-             'CIFAR100': './dataset/:q',
+             'CIFAR100': './dataset/',
              }
 
 parser = argparse.ArgumentParser()
