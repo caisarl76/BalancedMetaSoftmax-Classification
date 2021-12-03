@@ -53,13 +53,13 @@ python main.py --cfg ./config/CIFAR10_LT/decouple_balanced_softmax_imba200.yaml
 ```
 - BALMS
 ```bash
-python main.py --cfg ./config/CIFAR10_LT/balms_imba200.yaml
+python main.py --cfg ./config/CIFAR10_LT/balms_cifar10_200.yaml
 ```
 ## Evaluation
 
 Model evaluation can be done using the following command:
 ```bash
-python main.py --cfg ./config/CIFAR10_LT/balms_imba200.yaml --test
+python main.py --cfg ./config/CIFAR10_LT/balms_cifar10_200.yaml --test
 ```
 
 ## Experiment Results
