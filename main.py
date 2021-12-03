@@ -25,8 +25,8 @@ from utils import source_import, get_value
 data_root = {'ImageNet': './dataset/ImageNet',
              'Places': './dataset/Places-LT',
              'iNaturalist18': '/checkpoint/bykang/iNaturalist18',
-             'CIFAR10': './dataset/data/',
-             'CIFAR100': './dataset/data/',
+             'CIFAR10': './dataset/',
+             'CIFAR100': './dataset/:q',
              }
 
 parser = argparse.ArgumentParser()
