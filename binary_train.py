@@ -73,12 +73,15 @@ config['networks']['classifier']['params']['num_classes'] = num_class_dict[args.
 config['training_opt']['num_classes'] = num_class_dict[args.dataset]
 config['training_opt']['dataset'] = args.dataset
 
+log_dir = config['training_opt']['log_dir'].split('/')
+
 if 'cifar' in args.dataset:
     config['training_opt']['imb_ratio'] = args.imb_ratio
     save_dir = args.dataset + '_' + (str)(args.imb_ratio)
-    config['training_opt']['log_dir'].replace('DEFAULT', save_dir)
+    log_dir[2] = save_dir
 else:
-    config['training_opt']['log_dir'].replace('DEFAULT', args.dataset)
+    log_dir[2] = args.dataset
+log_dir = '/'.join(log_dir)
 
 test_mode = args.test
 test_open = args.test_open
