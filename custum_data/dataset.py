@@ -234,12 +234,8 @@ def get_dataset(data_root, dataset,
 
         train_dataset = ImbalanceCIFAR10(root=data_root, imb_type='exp', imb_factor=imb_ratio, rand_number=0,
                                          train=True, download=True, transform=transform_train)
-        val_dataset = datasets.CIFAR10(
-            root=data_root,
-            train=False,
-            download=True,
-            transform=val_transform
-        )
+        val_dataset = ImbalanceCIFAR10(root=data_root, imb_type='exp', imb_factor=1.0, rand_number=0,
+                                         train=False, download=True, transform=val_transform)
 
     elif dataset == 'cifar100':
 
