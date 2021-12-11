@@ -91,6 +91,8 @@ class Cub2011(Dataset):
                 self.data = self.data.append(temp)
         else:
             self.data = self.data[self.data.is_training_img == 0]
+        self.targets = self.data.target.to_numpy()
+
     def get_cls_num_list(self):
         return self.img_num_list
 

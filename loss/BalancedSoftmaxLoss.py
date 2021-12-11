@@ -23,11 +23,9 @@ class BalancedSoftmax(_Loss):
     """
     Balanced Softmax Loss
     """
-    def __init__(self, freq_path):
+    def __init__(self, cls_num_list):
         super(BalancedSoftmax, self).__init__()
-        with open(freq_path, 'r') as fd:
-            freq = json.load(fd)
-        freq = torch.tensor(freq)
+        freq = torch.tensor(cls_num_list)
         self.sample_per_class = freq
 
     def forward(self, input, label, reduction='mean'):

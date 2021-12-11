@@ -23,6 +23,8 @@ from utils import source_import, get_value
 from custum_data.dataset import get_dataset
 parser = argparse.ArgumentParser()
 parser.add_argument('--cfg', default=None, type=str)
+parser.add_argument('--dataset', type=str, default='cifar100')
+parser.add_argument('--imb_ratio', type=float, default=0.1)
 parser.add_argument('--test', default=False, action='store_true')
 parser.add_argument('--batch_size', type=int, default=None)
 parser.add_argument('--test_open', default=False, action='store_true')
@@ -50,6 +52,33 @@ def update(config, args):
 with open(args.cfg) as f:
     config = yaml.load(f)
 config = update(config, args)
+
+num_class_dict = {
+    'cifar10':10,
+    'cifar100':100,
+    'cub':200,
+    'imagenet':1000,
+    'inat':8142,
+    'fgvc':100,
+    'dogs':120,
+    'cars':196,
+    'flowers':102,
+    'dtd':47,
+    'caltech':102,
+    'places':365,
+    'fruits':24,
+}
+
+config['networks']['classifier']['params']['num_classes'] = num_class_dict[args.dataset]
+config['training_opt']['num_classes'] = num_class_dict[args.dataset]
+config['training_opt']['dataset'] = args.dataset
+
+if 'cifar' in args.dataset:
+    config['training_opt']['imb_ratio'] = args.imb_ratio
+    save_dir = args.dataset + '_' + (str)(args.imb_ratio)
+    config['training_opt']['log_dir'].replace('DEFAULT', save_dir)
+else:
+    config['training_opt']['log_dir'].replace('DEFAULT', args.dataset)
 
 test_mode = args.test
 test_open = args.test_open
@@ -93,6 +122,11 @@ if not test_mode:
                        num_workers=training_opt['num_workers'],
                        imb_ratio=training_opt['imb_ratio']
                        )
+
+    if 'BalancedSoftmaxLoss' in config['criterions']['PerformanceLoss']['def_file']:
+        config['criterions']['PerformanceLoss']['loss_params']['cls_num_list'] = \
+            data['train'].dataset.get_cls_num_list()
+
 
     if sampler_defs and sampler_defs['type'] == 'MetaSampler':   # todo: use meta-sampler
         cbs_file = './data/ClassAwareSampler.py'
