@@ -17,7 +17,7 @@ networks:
   classifier:
     def_file: ./models/DotProductClassifier.py
     optim_params: {lr: 0.05, momentum: 0.9, weight_decay: 0.0005}
-    params: {feat_dim: 1024, num_classes: 100}
+    params: {feat_dim: 1024, num_classes: 200}
   feat_model:
     def_file: ./models/reactnet.py
     fix: false
@@ -31,7 +31,7 @@ training_opt:
   display_step: 10
   feature_dim: 1024
   log_dir: ./logs/cub/binary/softmax_imba100
-  num_classes: 100
+  num_classes: 200
   num_iterations: 13000
   num_workers: 4
   open_threshold: 0.1
