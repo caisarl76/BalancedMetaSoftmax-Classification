@@ -81,7 +81,7 @@ if 'cifar' in args.dataset:
     log_dir[2] = save_dir
 else:
     log_dir[2] = args.dataset
-log_dir = '/'.join(log_dir)
+config['training_opt']['log_dir'] = '/'.join(log_dir)
 
 test_mode = args.test
 test_open = args.test_open
