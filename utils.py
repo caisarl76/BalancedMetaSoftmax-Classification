@@ -105,7 +105,7 @@ def shot_acc (preds, labels, train_data, many_shot_thr=100, low_shot_thr=20, acc
     if isinstance(train_data, np.ndarray):
         training_labels = np.array(train_data).astype(int)
     else:
-        training_labels = np.array(train_data.dataset.labels).astype(int)
+        training_labels = np.array(train_data.dataset.targets).astype(int)
 
     if isinstance(preds, torch.Tensor):
         preds = preds.detach().cpu().numpy()
@@ -148,7 +148,7 @@ def shot_acc (preds, labels, train_data, many_shot_thr=100, low_shot_thr=20, acc
 
 def weighted_shot_acc (preds, labels, ws, train_data, many_shot_thr=100, low_shot_thr=20):
     
-    training_labels = np.array(train_data.dataset.labels).astype(int)
+    training_labels = np.array(train_data.dataset.targets).astype(int)
 
     if isinstance(preds, torch.Tensor):
         preds = preds.detach().cpu().numpy()
@@ -213,7 +213,7 @@ def weighted_mic_acc_cal(preds, labels, ws):
     return acc_mic_top1
 
 def class_count (data):
-    labels = np.array(data.dataset.labels)
+    labels = np.array(data.dataset.targets)
     class_data_num = []
     for l in np.unique(labels):
         class_data_num.append(len(labels[labels == l]))

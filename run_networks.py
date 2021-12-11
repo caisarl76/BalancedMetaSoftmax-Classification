@@ -407,6 +407,10 @@ class model ():
                     self.data['train'].sampler.update_weights(*inlist)
                     # self.data['train'].sampler.update_weights(indexes.cpu().numpy(), ws)
 
+                # REMOVE
+                print('custum section')
+                break
+
             if hasattr(self.data['train'].sampler, 'get_weights'):
                 self.logger.log_ws(epoch, self.data['train'].sampler.get_weights())
             if hasattr(self.data['train'].sampler, 'reset_weights'):
