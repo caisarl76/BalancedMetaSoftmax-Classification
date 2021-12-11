@@ -408,7 +408,7 @@ class model ():
                     # self.data['train'].sampler.update_weights(indexes.cpu().numpy(), ws)
 
                 #REMOVE
-                break
+                # break
 
 
             if hasattr(self.data['train'].sampler, 'get_weights'):
