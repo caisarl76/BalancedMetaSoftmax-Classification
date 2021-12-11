@@ -20,15 +20,7 @@ from run_networks import model
 import warnings
 import yaml
 from utils import source_import, get_value
-
-
-data_root = {'ImageNet': './dataset/ImageNet',
-             'Places': './dataset/Places-LT',
-             'iNaturalist18': '/checkpoint/bykang/iNaturalist18',
-             'CIFAR10': './dataset/',
-             'CIFAR100': './dataset/',
-             }
-
+from custum_data.dataset import get_dataset
 parser = argparse.ArgumentParser()
 parser.add_argument('--cfg', default=None, type=str)
 parser.add_argument('--test', default=False, action='store_true')
@@ -71,7 +63,6 @@ dataset = training_opt['dataset']
 if not os.path.isdir(training_opt['log_dir']):
     os.makedirs(training_opt['log_dir'])
 
-print('Loading dataset from: %s' % data_root[dataset.rstrip('_LT')])
 pprint.pprint(config)
 
 if not test_mode:
@@ -95,13 +86,13 @@ if not test_mode:
     splits = ['train', 'train_plain', 'val']
     if dataset not in ['iNaturalist18', 'ImageNet']:
         splits.append('test')
-    data = {x: dataloader.load_data(data_root=data_root[dataset.rstrip('_LT')],
-                                    dataset=dataset, phase=x,
-                                    batch_size=training_opt['batch_size'],
-                                    sampler_dic=sampler_dic,
-                                    num_workers=training_opt['num_workers'],
-                                    cifar_imb_ratio=training_opt['cifar_imb_ratio'] if 'cifar_imb_ratio' in training_opt else None)
-            for x in splits}
+    data = get_dataset(data_root='./dataset',
+                       dataset=dataset,
+                       sampler_dic=sampler_dic,
+                       batch_size=training_opt['batch_size'],
+                       num_workers=training_opt['num_workers'],
+                       imb_ratio=training_opt['imb_ratio']
+                       )
 
     if sampler_defs and sampler_defs['type'] == 'MetaSampler':   # todo: use meta-sampler
         cbs_file = './data/ClassAwareSampler.py'
