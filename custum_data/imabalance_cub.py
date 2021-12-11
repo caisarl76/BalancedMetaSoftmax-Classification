@@ -110,7 +110,7 @@ class Cub2011(Dataset):
                 return [sample1, sample2], target
             else:
                 img = self.transform(img)
-                return img, target
+                return img, target, idx
 
 if __name__ == '__main__':
     train_transform = transforms.Compose([
