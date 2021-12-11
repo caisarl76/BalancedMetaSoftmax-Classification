@@ -27,7 +27,7 @@ shuffle: false
 training_opt:
   backbone: reactnet
   batch_size: 512
-  dataset: CIFAR100_LT
+  dataset: cifar100
   display_step: 10
   feature_dim: 1024
   log_dir: ./logs/CIFAR100_LT/binary/softmax_imba100
@@ -38,4 +38,4 @@ training_opt:
   sampler: null
   scheduler_params: {gamma: 0.1, step_size: 3}
   sub_dir: models
-  cifar_imb_ratio: 100
+  imb_ratio: 0.01

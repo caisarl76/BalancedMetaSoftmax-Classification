@@ -108,9 +108,6 @@ class LT_Dataset(Dataset):
 def load_data(data_root, dataset, phase, batch_size, sampler_dic=None, num_workers=4, test_open=False, shuffle=True, cifar_imb_ratio=None, meta=False):
     if phase == 'train_plain':
         txt_split = 'train'
-    elif phase == 'train_val':
-        txt_split = 'val'
-        phase = 'train'
     else:
         txt_split = phase
     txt = './data/%s/%s_%s.txt'%(dataset, dataset, txt_split)
