@@ -133,7 +133,8 @@ if not test_mode:
     else:
         cbs_sampler_dic = None
         meta=False
-
+    if training_opt['dataset'] in ['imagenet', 'places', 'inat']:
+        training_opt['num_workers'] = 16
     data = get_dataset(data_root='./dataset',
                        dataset=dataset,
                        sampler_dic=sampler_dic,
@@ -146,6 +147,9 @@ if not test_mode:
     if 'BalancedSoftmaxLoss' in config['criterions']['PerformanceLoss']['def_file']:
         config['criterions']['PerformanceLoss']['loss_params']['cls_num_list'] = \
             data['train'].dataset.get_cls_num_list()
+
+
+
 
 
     if sampler_defs and sampler_defs['type'] == 'MetaSampler':   # todo: use meta-sampler
@@ -175,16 +179,13 @@ else:
 
     splits.append('train_plain')
 
-    data = {x: dataloader.load_data(data_root=data_root[dataset.rstrip('_LT')],
-                                    dataset=dataset, phase=x,
-                                    batch_size=training_opt['batch_size'],
-                                    sampler_dic=None, 
-                                    test_open=test_open,
-                                    num_workers=training_opt['num_workers'],
-                                    shuffle=False,
-                                    cifar_imb_ratio=training_opt['cifar_imb_ratio'] if 'cifar_imb_ratio' in training_opt else None)
-            for x in splits}
-    
+    data = get_dataset(data_root='./dataset',
+                       dataset=dataset,
+                       batch_size=training_opt['batch_size'],
+                       num_workers=training_opt['num_workers'],
+                       imb_ratio=training_opt['imb_ratio'],
+                       )
+
     training_model = model(config, data, test=True)
     # training_model.load_model()
     training_model.load_model(args.model_dir)
