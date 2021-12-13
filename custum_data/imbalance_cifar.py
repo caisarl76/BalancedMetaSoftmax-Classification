@@ -63,6 +63,8 @@ class ImbalanceCIFAR10(torchvision.datasets.CIFAR10):
         Returns:
             tuple: (image, target) where target is index of the target class.
         """
+        if type(index) != int:
+            print('wrong type!')
         img, target = self.data[index], self.targets[index]
 
         # doing this so that it is consistent with all other datasets
@@ -81,6 +83,7 @@ class ImbalanceCIFAR10(torchvision.datasets.CIFAR10):
             else:
                 sample = self.transform(img)
                 return sample, target, index
+
 
 class ImbalanceCIFAR100(ImbalanceCIFAR10):
     base_folder = 'cifar-100-python'
