@@ -21,6 +21,7 @@ import warnings
 import yaml
 from utils import source_import, get_value
 from custum_data.dataset import get_dataset
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--cfg', default=None, type=str)
 parser.add_argument('--dataset', type=str, default='cifar100')
@@ -36,8 +37,8 @@ parser.add_argument('--save_feat', type=str, default='')
 parser.add_argument('--feat_type', type=str, default='cl2n')
 parser.add_argument('--dist_type', type=str, default='l2')
 
-
 args = parser.parse_args()
+
 
 def update(config, args):
     # Change parameters
@@ -47,6 +48,7 @@ def update(config, args):
 
     return config
 
+
 # ============================================================================
 # LOAD CONFIGURATIONS
 with open(args.cfg) as f:
@@ -54,25 +56,24 @@ with open(args.cfg) as f:
 config = update(config, args)
 
 num_class_dict = {
-    'cifar10':10,
-    'cifar100':100,
-    'cub':200,
-    'imagenet':1000,
-    'inat':8142,
-    'fgvc':100,
-    'dogs':120,
-    'cars':196,
-    'flowers':102,
-    'dtd':47,
-    'caltech':102,
-    'places':365,
-    'fruits':24,
+    'cifar10': 10,
+    'cifar100': 100,
+    'cub': 200,
+    'imagenet': 1000,
+    'inat': 8142,
+    'fgvc': 100,
+    'dogs': 120,
+    'cars': 196,
+    'flowers': 102,
+    'dtd': 47,
+    'caltech': 102,
+    'places': 365,
+    'fruits': 24,
 }
 
 config['networks']['classifier']['params']['num_classes'] = num_class_dict[args.dataset]
 config['training_opt']['num_classes'] = num_class_dict[args.dataset]
 config['training_opt']['dataset'] = args.dataset
-
 
 log_dir = config['training_opt']['log_dir'].split('/')
 model_dir = config['model_dir'].split('/')
@@ -123,16 +124,16 @@ if not test_mode:
     if dataset not in ['iNaturalist18', 'ImageNet']:
         splits.append('test')
 
-    if sampler_defs and sampler_defs['type'] == 'MetaSampler':   # todo: use meta-sampler
+    if sampler_defs and sampler_defs['type'] == 'MetaSampler':  # todo: use meta-sampler
         cbs_file = './data/ClassAwareSampler.py'
         cbs_sampler_dic = {
-                'sampler': source_import(cbs_file).get_sampler(),
-                'params': {'is_infinite': True}
+            'sampler': source_import(cbs_file).get_sampler(),
+            'params': {'is_infinite': True}
         }
-        meta=cbs_sampler_dic
+        meta = cbs_sampler_dic
     else:
         cbs_sampler_dic = None
-        meta=False
+        meta = False
     if training_opt['dataset'] in ['imagenet', 'places', 'inat']:
         training_opt['num_workers'] = 16
     data = get_dataset(data_root='./dataset',
@@ -148,11 +149,7 @@ if not test_mode:
         config['criterions']['PerformanceLoss']['loss_params']['cls_num_list'] = \
             data['train'].dataset.get_cls_num_list()
 
-
-
-
-
-    if sampler_defs and sampler_defs['type'] == 'MetaSampler':   # todo: use meta-sampler
+    if sampler_defs and sampler_defs['type'] == 'MetaSampler':  # todo: use meta-sampler
         training_model = model(config, data, test=False, meta_sample=True, learner=learner)
     else:
         training_model = model(config, data, test=False)
@@ -194,10 +191,10 @@ else:
         test_split = args.save_feat
     else:
         saveit = False
-    
+
     training_model.eval(phase=test_split, openset=test_open, save_feat=saveit)
-    
+
     if output_logits:
         training_model.output_logits(openset=test_open)
-        
+
 print('ALL COMPLETED.')
