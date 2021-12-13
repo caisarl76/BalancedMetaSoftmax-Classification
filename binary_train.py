@@ -66,7 +66,7 @@ num_class_dict = {
     'cars': 196,
     'flowers': 102,
     'dtd': 47,
-    'caltech': 102,
+    'caltech101': 102,
     'places': 365,
     'fruits': 24,
 }
