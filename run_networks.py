@@ -407,6 +407,7 @@ class model ():
                     self.data['train'].sampler.update_weights(*inlist)
                     # self.data['train'].sampler.update_weights(indexes.cpu().numpy(), ws)
 
+
                 #REMOVE
                 # break
 
