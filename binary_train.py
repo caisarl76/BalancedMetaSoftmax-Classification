@@ -73,15 +73,19 @@ config['networks']['classifier']['params']['num_classes'] = num_class_dict[args.
 config['training_opt']['num_classes'] = num_class_dict[args.dataset]
 config['training_opt']['dataset'] = args.dataset
 
-log_dir = config['training_opt']['log_dir'].split('/')
 
+log_dir = config['training_opt']['log_dir'].split('/')
+model_dir = config['model_dir'].split('/')
 if 'cifar' in args.dataset:
     config['training_opt']['imb_ratio'] = args.imb_ratio
     save_dir = args.dataset + '_' + (str)(args.imb_ratio)
     log_dir[2] = save_dir
+    model_dir[2] = save_dir
 else:
     log_dir[2] = args.dataset
+    model_dir[2] = args.dataset
 config['training_opt']['log_dir'] = '/'.join(log_dir)
+config['model_dir'] = '/'.join(model_dir)
 
 test_mode = args.test
 test_open = args.test_open
@@ -118,12 +122,25 @@ if not test_mode:
     splits = ['train', 'train_plain', 'val']
     if dataset not in ['iNaturalist18', 'ImageNet']:
         splits.append('test')
+
+    if sampler_defs and sampler_defs['type'] == 'MetaSampler':   # todo: use meta-sampler
+        cbs_file = './data/ClassAwareSampler.py'
+        cbs_sampler_dic = {
+                'sampler': source_import(cbs_file).get_sampler(),
+                'params': {'is_infinite': True}
+        }
+        meta=cbs_sampler_dic
+    else:
+        cbs_sampler_dic = None
+        meta=False
+
     data = get_dataset(data_root='./dataset',
                        dataset=dataset,
                        sampler_dic=sampler_dic,
                        batch_size=training_opt['batch_size'],
                        num_workers=training_opt['num_workers'],
-                       imb_ratio=training_opt['imb_ratio']
+                       imb_ratio=training_opt['imb_ratio'],
+                       meta=cbs_sampler_dic
                        )
 
     if 'BalancedSoftmaxLoss' in config['criterions']['PerformanceLoss']['def_file']:
@@ -132,19 +149,6 @@ if not test_mode:
 
 
     if sampler_defs and sampler_defs['type'] == 'MetaSampler':   # todo: use meta-sampler
-        cbs_file = './data/ClassAwareSampler.py'
-        cbs_sampler_dic = {
-                'sampler': source_import(cbs_file).get_sampler(),
-                'params': {'is_infinite': True}
-            }
-        # use Class Balanced Sampler to create meta set
-        data['meta'] = dataloader.load_data(data_root=data_root[dataset.rstrip('_LT')],
-                                    dataset=dataset, phase='train' if 'CIFAR' in dataset else 'val',
-                                    batch_size=sampler_defs.get('meta_batch_size', training_opt['batch_size'], ),
-                                    sampler_dic=cbs_sampler_dic,
-                                    num_workers=training_opt['num_workers'],
-                                    cifar_imb_ratio=training_opt['cifar_imb_ratio'] if 'cifar_imb_ratio' in training_opt else None,
-                                    meta=True)
         training_model = model(config, data, test=False, meta_sample=True, learner=learner)
     else:
         training_model = model(config, data, test=False)

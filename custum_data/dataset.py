@@ -477,6 +477,13 @@ def get_dataset(data_root, dataset,
     else:
         print('no such dataset')
 
+    val_loader = DataLoader(
+        dataset=val_dataset,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=num_workers
+    )
+
     if sampler_dic and sampler_dic.get('batch_sampler', False):
         print('Using sampler', sampler_dic['sampler'])
         train_loader = DataLoader(
@@ -484,16 +491,18 @@ def get_dataset(data_root, dataset,
             batch_sampler=sampler_dic['sampler'](train_dataset, **sampler_dic['params']),
             num_workers=num_workers
         )
-    elif sampler_dic and meta:
-        print('Using sampler', sampler_dic['sampler'])
-        print('Sampler parameters: ', sampler_dic['params'])
-        train_loader = DataLoader(
-            dataset=train_dataset,
-            batch_size=batch_size,
-            shuffle=False,
-            sampler=sampler_dic['sampler'](train_dataset, **sampler_dic['params']),
-            num_workers=num_workers
-        )
+        if meta:
+            print('Using sampler', sampler_dic['sampler'])
+            print('Sampler parameters: ', sampler_dic['params'])
+            meta_loader = DataLoader(
+                dataset=train_dataset,
+                batch_size=batch_size,
+                shuffle=False,
+                sampler=meta['sampler'](train_dataset, **meta['params']),
+                num_workers=num_workers
+
+            )
+            return {'train': train_loader, 'val': val_loader, 'meta':meta_loader}
     else:
         train_loader = DataLoader(
             dataset=train_dataset,
@@ -501,12 +510,7 @@ def get_dataset(data_root, dataset,
             shuffle=True,
             num_workers=num_workers
         )
-    val_loader = DataLoader(
-        dataset=val_dataset,
-        batch_size=batch_size,
-        shuffle=False,
-        num_workers=num_workers
-    )
+
 
     return {'train': train_loader, 'val': val_loader}
 

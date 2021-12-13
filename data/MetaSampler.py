@@ -66,25 +66,25 @@ class SampleLearner(nn.Module):
 
 class MetaSampler(Sampler):
     def __init__(self, data_source, batch_size, meta_learner):
-        num_classes = len(np.unique(data_source.labels))
+        num_classes = len(np.unique(data_source.targets))
         cls_data_list = [list() for _ in range(num_classes)]
-        for i, label in enumerate(data_source.labels):
+        for i, label in enumerate(data_source.targets):
             cls_data_list[label].append(i)
-        self.num_samples = len(data_source.labels)
+        self.num_samples = len(data_source.targets)
 
         self.batch_size = batch_size
         self.num_classes = num_classes
         self.meta_learner = meta_learner
-        self.indices = list(range(len(data_source.labels)))
+        self.indices = list(range(len(data_source.targets)))
 
         targets = []
-        for i, label in enumerate(data_source.labels):
+        for i, label in enumerate(data_source.targets):
             cls_data_list[label].append(i)
             targets.append(label)
 
         targets = torch.tensor(targets)
         self.targets_onehot = nn.functional.one_hot(targets, num_classes).float().cuda()
-        self.meta_learner.init_learner(data_source.img_num_per_cls)
+        self.meta_learner.init_learner(data_source.get_cls_num_list())
 
     def __iter__(self):
         for _ in range(self.num_samples // self.batch_size):
