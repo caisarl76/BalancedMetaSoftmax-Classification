@@ -127,7 +127,7 @@ if not test_mode:
         sampler_dic = None
 
     splits = ['train', 'train_plain', 'val']
-    if dataset not in ['iNaturalist18', 'ImageNet']:
+    if dataset not in ['inat', 'imagenet']:
         splits.append('test')
 
     if sampler_defs and sampler_defs['type'] == 'MetaSampler':  # todo: use meta-sampler
