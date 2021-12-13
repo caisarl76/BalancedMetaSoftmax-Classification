@@ -76,17 +76,23 @@ config['training_opt']['num_classes'] = num_class_dict[args.dataset]
 config['training_opt']['dataset'] = args.dataset
 
 log_dir = config['training_opt']['log_dir'].split('/')
-model_dir = config['model_dir'].split('/')
+if config['model_dir'] is not None:
+    model_dir = config['model_dir'].split('/')
+else:
+    model_dir = None
 if 'cifar' in args.dataset:
     config['training_opt']['imb_ratio'] = args.imb_ratio
     save_dir = args.dataset + '_' + (str)(args.imb_ratio)
     log_dir[2] = save_dir
-    model_dir[2] = save_dir
+    if model_dir:
+        model_dir[2] = save_dir
 else:
     log_dir[2] = args.dataset
-    model_dir[2] = args.dataset
+    if model_dir:
+        model_dir[2] = args.dataset
 config['training_opt']['log_dir'] = '/'.join(log_dir)
-config['model_dir'] = '/'.join(model_dir)
+if model_dir:
+    config['model_dir'] = '/'.join(model_dir)
 
 test_mode = args.test
 test_open = args.test_open
