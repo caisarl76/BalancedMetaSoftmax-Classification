@@ -8,7 +8,7 @@ criterions:
 endlr: 0.0
 last: false
 memory: {centroids: false, init_centroids: false}
-model_dir: ./logs/DEFAULT/binary/softmax
+model_dir: ./runs/DEFAULT/binary/softmax
 networks:
   classifier:
     def_file: ./models/DotProductClassifier.py
@@ -26,7 +26,7 @@ training_opt:
   dataset: cifar100
   display_step: 10
   feature_dim: 1024
-  log_dir: ./logs/DEFAULT/binary/balms
+  log_dir: ./runs/DEFAULT/binary/balms
   num_classes: 100
   num_iterations: 2000
   num_workers: 4
