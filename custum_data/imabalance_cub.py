@@ -8,22 +8,22 @@ from torchvision.datasets.utils import download_url
 from torch.utils.data import Dataset
 
 transform_train_cub = transforms.Compose([
-        transforms.RandomResizedCrop(224),
-        transforms.RandomHorizontalFlip(),
-        transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    ])
+    transforms.RandomResizedCrop(224),
+    transforms.RandomHorizontalFlip(),
+    transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+])
 
 val_transform_cub = transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    ])
+    transforms.Resize(256),
+    transforms.CenterCrop(224),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+])
+
 
 class Cub2011(Dataset):
-
     base_folder = 'images'
     url = 'http://www.vision.caltech.edu/visipedia-data/CUB-200-2011/CUB_200_2011.tgz'
     filename = 'CUB_200_2011.tgz'
@@ -55,6 +55,7 @@ class Cub2011(Dataset):
         self.img_num_list = self.get_img_num_per_cls(200, imb_type, imb_factor)
         self.gen_imbalanced_data()
         self.cls_num_list = self.img_num_list
+        print('none')
 
     def get_img_num_per_cls(self, cls_num, imb_type, imb_factor):
         img_max = 30
@@ -81,13 +82,16 @@ class Cub2011(Dataset):
         train_test_split = pd.read_csv(os.path.join(self.root, 'train_test_split.txt'),
                                        sep=' ', names=['img_id', 'is_training_img'])
         data = images.merge(image_class_labels, on='img_id')
+        for i, item in enumerate(image_class_labels.target):
+            image_class_labels.target[i] = item - 1
         self.data = data.merge(train_test_split, on='img_id')
 
         if self.train:
             train = self.data[self.data.is_training_img == 1]
             self.data = train[train.target == 1].iloc[np.random.choice(30, self.img_num_list[0]), :]
             for i in range(2, 201):
-                temp = train[train.target == i].iloc[np.random.choice(len(train[train.target==i]), self.img_num_list[i - 1]), :]
+                temp = train[train.target == i].iloc[
+                       np.random.choice(len(train[train.target == i]), self.img_num_list[i - 1]), :]
                 self.data = self.data.append(temp)
         else:
             self.data = self.data[self.data.is_training_img == 0]
@@ -113,6 +117,7 @@ class Cub2011(Dataset):
             else:
                 img = self.transform(img)
                 return img, target, idx
+
 
 if __name__ == '__main__':
     train_transform = transforms.Compose([
