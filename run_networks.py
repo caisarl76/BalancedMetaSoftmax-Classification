@@ -43,6 +43,7 @@ class model ():
         
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         self.config = config
+        self.optim_type = self.config['optimizer']
         self.training_opt = self.config['training_opt']
         self.memory = self.config['memory']
         self.data = data
@@ -147,10 +148,15 @@ class model ():
 
             # Optimizer list
             optim_params = val['optim_params']
-            self.model_optim_params_list.append({'params': self.networks[key].parameters(),
-                                                'lr': optim_params['lr'],
-                                                'momentum': optim_params['momentum'],
-                                                'weight_decay': optim_params['weight_decay']})
+            if self.optim_type == 'sgd':
+                self.model_optim_params_list.append({'params': self.networks[key].parameters(),
+                                                    'lr': optim_params['lr'],
+                                                    'momentum': optim_params['momentum'],
+                                                    'weight_decay': optim_params['weight_decay']})
+            elif self.optim_type == 'adam':
+                self.model_optim_params_list.append({'params': self.networks[key].parameters(),
+                                                    'lr': optim_params['lr']
+                                                    })
 
     def init_criterions(self):
         criterion_defs = self.config['criterions']
@@ -178,7 +184,11 @@ class model ():
                 self.criterion_optimizer = None
 
     def init_optimizers(self, optim_params):
-        optimizer = optim.SGD(optim_params)
+        if self.config['optimizer'] == 'adam':
+            optimizer = optim.Adam(optim_params)
+        elif self.config['optimizer'] == 'sgd':
+            optimizer = optim.SGD(optim_params)
+
         if self.config['coslr']:
             print("===> Using coslr eta_min={}".format(self.config['endlr']))
             scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
