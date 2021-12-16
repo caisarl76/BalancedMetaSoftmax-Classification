@@ -1,0 +1,38 @@
+optimizer: adam
+coslr: true
+criterions:
+  PerformanceLoss:
+    def_file: ./loss/BalancedSoftmaxLoss.py
+    loss_params: {cls_num_list: []}
+    optim_params: null
+    weight: 1.0
+endlr: 0.0
+last: false
+memory: {centroids: false, init_centroids: false}
+model_dir: ./runs/DEFAULT/binary/softmax
+networks:
+  classifier:
+    def_file: ./models/DotProductClassifier.py
+    optim_params: {lr: 0.1, momentum: 0.9, weight_decay: 0.0005}
+    params: {feat_dim: 1024, num_classes: 100}
+  feat_model:
+    def_file: ./models/reactnet.py
+    fix: true
+    optim_params: {lr: 0.1, momentum: 0.9, weight_decay: 0.0005}
+    params: {}
+shuffle: false
+training_opt:
+  backbone: reactnet
+  batch_size: 256
+  dataset: cifar100
+  display_step: 10
+  feature_dim: 1024
+  log_dir: ./runs/DEFAULT/binary/balms
+  num_classes: 100
+  num_iterations: 2000
+  num_workers: 4
+  open_threshold: 0.1
+  sampler: {def_file: ./data/MetaSampler.py, type: MetaSampler}
+  scheduler_params: {gamma: 0.1, step_size: 3}
+  sub_dir: models
+  imb_ratio: 0.1
