@@ -36,24 +36,9 @@ parser.add_argument('--save_feat', type=str, default='')
 # KNN testing parameters 
 parser.add_argument('--feat_type', type=str, default='cl2n')
 parser.add_argument('--dist_type', type=str, default='l2')
+parser.add_argument('--lr', type=float, default=0.1)
 
 args = parser.parse_args()
-
-
-def update(config, args):
-    # Change parameters
-    config['model_dir'] = get_value(config['model_dir'], args.model_dir)
-    config['training_opt']['batch_size'] = \
-        get_value(config['training_opt']['batch_size'], args.batch_size)
-
-    return config
-
-
-# ============================================================================
-# LOAD CONFIGURATIONS
-with open(args.cfg) as f:
-    config = yaml.load(f)
-config = update(config, args)
 
 num_class_dict = {
     'cifar10': 10,
@@ -71,9 +56,35 @@ num_class_dict = {
     'fruits': 24,
 }
 
-config['networks']['classifier']['params']['num_classes'] = num_class_dict[args.dataset]
-config['training_opt']['num_classes'] = num_class_dict[args.dataset]
-config['training_opt']['dataset'] = args.dataset
+def update(config, args):
+    # Change parameters
+    config['model_dir'] = get_value(config['model_dir'], args.model_dir)
+    config['training_opt']['batch_size'] = \
+        get_value(config['training_opt']['batch_size'], args.batch_size)
+
+    config['networks']['classifier']['params']['num_classes'] = num_class_dict[args.dataset]
+    config['training_opt']['num_classes'] = num_class_dict[args.dataset]
+    config['training_opt']['dataset'] = args.dataset
+
+    config['networks']['classifier']['optim_params']['lr'] = args.lr
+    config['networks']['feat_model']['optim_params']['lr'] = args.lr
+    config['model_dir'] = os.path.join(config['model_dir'], ('lr_' + (str)(args.lr)))
+
+    if config['model_dir'] != 'null':
+        config['model_dir'] = os.path.join(config['model_dir'], ('lr_' + (str)(args.lr)))
+    config['training_opt']['log_dir'] = os.path.join(config['training_opt']['log_dir'], ('lr_' + (str)(args.lr)))
+    return config
+
+
+# ============================================================================
+# LOAD CONFIGURATIONS
+with open(args.cfg) as f:
+    config = yaml.load(f)
+config = update(config, args)
+
+
+
+
 
 log_dir = config['training_opt']['log_dir'].split('/')
 if config['model_dir'] is not None:
