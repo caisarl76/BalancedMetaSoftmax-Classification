@@ -81,9 +81,10 @@ class Cub2011(Dataset):
             sep=' ', names=['img_id', 'target'])
         train_test_split = pd.read_csv(os.path.join(self.root, 'train_test_split.txt'),
                                        sep=' ', names=['img_id', 'is_training_img'])
-        data = images.merge(image_class_labels, on='img_id')
         for i, item in enumerate(image_class_labels.target):
             image_class_labels.target[i] = item - 1
+        data = images.merge(image_class_labels, on='img_id')
+
         self.data = data.merge(train_test_split, on='img_id')
 
         if self.train:
