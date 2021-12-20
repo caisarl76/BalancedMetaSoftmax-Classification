@@ -89,10 +89,10 @@ class Cub2011(Dataset):
 
         if self.train:
             train = self.data[self.data.is_training_img == 1]
-            self.data = train[train.target == 1].iloc[np.random.choice(30, self.img_num_list[0]), :]
-            for i in range(2, 201):
+            self.data = train[train.target == 0].iloc[np.random.choice(30, self.img_num_list[0]), :]
+            for i in range(1, 200):
                 temp = train[train.target == i].iloc[
-                       np.random.choice(len(train[train.target == i]), self.img_num_list[i - 1]), :]
+                       np.random.choice(len(train[train.target == i]), self.img_num_list[i]), :]
                 self.data = self.data.append(temp)
         else:
             self.data = self.data[self.data.is_training_img == 0]
