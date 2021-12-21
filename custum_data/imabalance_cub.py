@@ -107,17 +107,17 @@ class Cub2011(Dataset):
     def __getitem__(self, idx):
         sample = self.data.iloc[idx]
         path = os.path.join(self.root, self.base_folder, sample.filepath)
-        target = sample.target - 1  # Targets start at 1 by default, so shift to 0
+        # target = sample.target - 1  # Targets start at 1 by default, so shift to 0
         img = self.loader(path)
 
         if self.transform is not None:
             if type(self.transform) == list:
                 sample1 = self.transform[0](img)
                 sample2 = self.transform[0](img)
-                return [sample1, sample2], target
+                return [sample1, sample2], sample.target
             else:
                 img = self.transform(img)
-                return img, target, idx
+                return img, sample.target, idx
 
 
 if __name__ == '__main__':
