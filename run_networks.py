@@ -29,8 +29,8 @@ import pdb
 import higher
 
 
-class model ():
-    
+class model():
+
     def __init__(self, config, data, test=False, meta_sample=False, learner=None):
 
         self.meta_sample = meta_sample
@@ -40,7 +40,7 @@ class model ():
             assert learner is not None
             self.learner = learner
             self.meta_data = iter(data['meta'])
-        
+
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         self.config = config
         self.optim_type = self.config['optimizer']
@@ -55,11 +55,11 @@ class model ():
         if self.training_opt.get('num_iterations', False):
             self.training_opt['num_epochs'] = math.ceil(self.training_opt['num_iterations'] / len(self.data['train']))
         if self.config.get('warmup_iterations', False):
-            self.config['warmup_epochs'] = math.ceil(self.config['warmup_iterations'] / len(self.data['train']))
+            self.config['warmup_epochs'] = max(math.ceil(self.config['warmup_iterations'] / len(self.data['train'])), 2)
 
         # Setup logger
         self.logger = Logger(self.training_opt['log_dir'])
-        
+
         # Initialize model
         self.init_models()
 
@@ -75,7 +75,7 @@ class model ():
             # oversampled data number 
             print('Using steps for training.')
             self.training_data_num = len(self.data['train'].dataset)
-            self.epoch_steps = int(self.training_data_num  \
+            self.epoch_steps = int(self.training_data_num \
                                    / self.training_opt['batch_size'])
 
             # Initialize model optimizer and scheduler
@@ -87,7 +87,7 @@ class model ():
             if self.memory['init_centroids']:
                 self.criterions['FeatureLoss'].centroids.data = \
                     self.centroids_cal(self.data['train_plain'])
-            
+
             # Set up log file
             self.log_file = os.path.join(self.training_opt['log_dir'], 'log.txt')
             if os.path.isfile(self.log_file):
@@ -98,13 +98,13 @@ class model ():
                 self.load_model()
                 if not self.networks['classifier'].initialized:
                     cfeats = self.get_knncentroids()
-                    print('===> Saving features to %s' % 
+                    print('===> Saving features to %s' %
                           os.path.join(self.training_opt['log_dir'], 'cfeats.pkl'))
                     with open(os.path.join(self.training_opt['log_dir'], 'cfeats.pkl'), 'wb') as f:
                         pickle.dump(cfeats, f)
                     self.networks['classifier'].update(cfeats)
             self.log_file = None
-        
+
     def init_models(self, optimizer=True):
         networks_defs = self.config['networks']
         self.networks = {}
@@ -116,7 +116,7 @@ class model ():
                                                    lr=self.training_opt['sampler'].get('lr', 0.01))
 
         print("Using", torch.cuda.device_count(), "GPUs.")
-        
+
         for key, val in networks_defs.items():
 
             # Networks
@@ -141,7 +141,7 @@ class model ():
                         param.requires_grad = False
                     # print('  | ', param_name, param.requires_grad)
 
-            if self.meta_sample and key!='classifier':
+            if self.meta_sample and key != 'classifier':
                 # avoid adding classifier parameters to the optimizer,
                 # otherwise error will be raised when computing higher gradients
                 continue
@@ -150,13 +150,12 @@ class model ():
             optim_params = val['optim_params']
             if self.optim_type == 'sgd':
                 self.model_optim_params_list.append({'params': self.networks[key].parameters(),
-                                                    'lr': optim_params['lr'],
-                                                    'momentum': optim_params['momentum'],
-                                                    'weight_decay': optim_params['weight_decay']})
+                                                     'lr': optim_params['lr'],
+                                                     'momentum': optim_params['momentum'],
+                                                     'weight_decay': optim_params['weight_decay']})
             elif self.optim_type == 'adam':
                 self.model_optim_params_list.append({'params': self.networks[key].parameters(),
-                                                    'lr': optim_params['lr']
-                                                    })
+                                                     'lr': optim_params['lr']})
 
     def init_criterions(self):
         criterion_defs = self.config['criterions']
@@ -169,14 +168,14 @@ class model ():
 
             self.criterions[key] = source_import(def_file).create_loss(*loss_args).cuda()
             self.criterion_weights[key] = val['weight']
-          
+
             if val['optim_params']:
                 print('Initializing criterion optimizer.')
                 optim_params = val['optim_params']
                 optim_params = [{'params': self.criterions[key].parameters(),
-                                'lr': optim_params['lr'],
-                                'momentum': optim_params['momentum'],
-                                'weight_decay': optim_params['weight_decay']}]
+                                 'lr': optim_params['lr'],
+                                 'momentum': optim_params['momentum'],
+                                 'weight_decay': optim_params['weight_decay']}]
                 # Initialize criterion optimizer and scheduler
                 self.criterion_optimizer, \
                 self.criterion_optimizer_scheduler = self.init_optimizers(optim_params)
@@ -188,6 +187,9 @@ class model ():
             optimizer = optim.Adam(optim_params)
         elif self.config['optimizer'] == 'sgd':
             optimizer = optim.SGD(optim_params)
+        else:
+            print('wrong optimizer!')
+            return
 
         if self.config['coslr']:
             print("===> Using coslr eta_min={}".format(self.config['endlr']))
@@ -195,7 +197,7 @@ class model ():
                 optimizer, self.training_opt['num_epochs'], eta_min=self.config['endlr'])
         elif self.config['coslrwarmup']:
             print("===> Using coslrwarmup eta_min={}, warmup_epochs={}".format(
-                self.config['endlr'],self.config['warmup_epochs']))
+                self.config['endlr'], self.config['warmup_epochs']))
             scheduler = CosineAnnealingLRWarmup(
                 optimizer=optimizer,
                 T_max=self.training_opt['num_epochs'],
@@ -210,7 +212,7 @@ class model ():
                                                   gamma=self.scheduler_params['gamma'])
         return optimizer, scheduler
 
-    def batch_forward (self, inputs, labels=None, centroids=False, feature_ext=False, phase='train'):
+    def batch_forward(self, inputs, labels=None, centroids=False, feature_ext=False, phase='train'):
         '''
         This is a general single batch running function. 
         '''
@@ -255,7 +257,7 @@ class model ():
         # First, apply performance loss
         if 'PerformanceLoss' in self.criterions.keys():
             self.loss_perf = self.criterions['PerformanceLoss'](self.logits, labels)
-            self.loss_perf *=  self.criterion_weights['PerformanceLoss']
+            self.loss_perf *= self.criterion_weights['PerformanceLoss']
             self.loss += self.loss_perf
 
         # Apply loss on features if set up
@@ -264,7 +266,7 @@ class model ():
             self.loss_feat = self.loss_feat * self.criterion_weights['FeatureLoss']
             # Add feature loss to total loss
             self.loss += self.loss_feat
-    
+
     def shuffle_batch(self, x, y):
         index = torch.randperm(x.size(0))
         x = x[index]
@@ -332,7 +334,7 @@ class model ():
                 model.train()
 
             torch.cuda.empty_cache()
-            
+
             # Set model modes and set scheduler
             # In training, step optimizer scheduler and set model to train() 
             self.model_optimizer_scheduler.step()
@@ -356,9 +358,9 @@ class model ():
                     if self.meta_sample:
                         # do inner loop
                         self.meta_forward(inputs, labels, verbose=step % self.training_opt['display_step'] == 0)
-                        
+
                     # If training, forward with loss, and no top 5 accuracy calculation
-                    self.batch_forward(inputs, labels, 
+                    self.batch_forward(inputs, labels,
                                        centroids=self.memory['centroids'],
                                        phase='train')
                     self.batch_loss(labels)
@@ -371,7 +373,6 @@ class model ():
 
                     # Output minibatch training results
                     if step % self.training_opt['display_step'] == 0:
-
                         minibatch_loss_feat = self.loss_feat.item() \
                             if 'FeatureLoss' in self.criterions.keys() else None
                         minibatch_loss_perf = self.loss_perf.item() \
@@ -379,16 +380,16 @@ class model ():
                         minibatch_loss_total = self.loss.item()
                         minibatch_acc = mic_acc_cal(preds, labels)
 
-                        print_str = ['Epoch: [%d/%d]' 
+                        print_str = ['Epoch: [%d/%d]'
                                      % (epoch, self.training_opt['num_epochs']),
-                                     'Step: %5d' 
+                                     'Step: %5d'
                                      % (step),
-                                     'Minibatch_loss_feature: %.3f' 
+                                     'Minibatch_loss_feature: %.3f'
                                      % (minibatch_loss_feat) if minibatch_loss_feat else '',
                                      'Minibatch_loss_performance: %.3f'
                                      % (minibatch_loss_perf) if minibatch_loss_perf else '',
                                      'Minibatch_accuracy_micro: %.3f'
-                                      % (minibatch_acc)]
+                                     % (minibatch_acc)]
                         print_write(print_str, self.log_file)
 
                         loss_info = {
@@ -406,7 +407,7 @@ class model ():
                 #    self.training_opt['sampler']['type'] == 'PrioritizedSampler':
                 if hasattr(self.data['train'].sampler, 'update_weights'):
                     if hasattr(self.data['train'].sampler, 'ptype'):
-                        ptype = self.data['train'].sampler.ptype 
+                        ptype = self.data['train'].sampler.ptype
                     else:
                         ptype = 'score'
                     ws = get_priority(ptype, self.logits.detach(), labels)
@@ -417,10 +418,8 @@ class model ():
                     self.data['train'].sampler.update_weights(*inlist)
                     # self.data['train'].sampler.update_weights(indexes.cpu().numpy(), ws)
 
-
-                #REMOVE
+                # REMOVE
                 # break
-
 
             if hasattr(self.data['train'].sampler, 'get_weights'):
                 self.logger.log_ws(epoch, self.data['train'].sampler.get_weights())
@@ -451,7 +450,7 @@ class model ():
                 best_centroids = self.centroids
                 best_model_weights['feat_model'] = copy.deepcopy(self.networks['feat_model'].state_dict())
                 best_model_weights['classifier'] = copy.deepcopy(self.networks['classifier'].state_dict())
-            
+
             print('===> Saving checkpoint')
             self.save_latest(epoch)
 
@@ -467,7 +466,7 @@ class model ():
         self.reset_model(best_model_weights)
         self.eval('test' if 'test' in self.data else 'val')
         print('Done')
-    
+
     def eval_with_preds(self, preds, labels):
         # Count the number of examples
         n_total = sum([len(p) for p in preds])
@@ -484,9 +483,9 @@ class model ():
             else:
                 normal_preds.append(p)
                 normal_labels.append(l)
-        
+
         # Calculate normal prediction accuracy
-        rsl = {'train_all':0., 'train_many':0., 'train_median':0., 'train_low': 0.}
+        rsl = {'train_all': 0., 'train_many': 0., 'train_median': 0., 'train_low': 0.}
         if len(normal_preds) > 0:
             normal_preds, normal_labels = list(map(np.concatenate, [normal_preds, normal_labels]))
             n_top1 = mic_acc_cal(normal_preds, normal_labels)
@@ -501,8 +500,8 @@ class model ():
         # Calculate mixup prediction accuracy
         if len(mixup_preds) > 0:
             mixup_preds, mixup_labels, mixup_ws = \
-                list(map(np.concatenate, [mixup_preds*2, mixup_labels1+mixup_labels2, mixup_ws]))
-            mixup_ws = np.concatenate([mixup_ws, 1-mixup_ws])
+                list(map(np.concatenate, [mixup_preds * 2, mixup_labels1 + mixup_labels2, mixup_ws]))
+            mixup_ws = np.concatenate([mixup_ws, 1 - mixup_ws])
             n_top1 = weighted_mic_acc_cal(mixup_preds, mixup_labels, mixup_ws)
             n_top1_many, \
             n_top1_median, \
@@ -529,9 +528,9 @@ class model ():
         time.sleep(0.25)
 
         if openset:
-            print('Under openset test mode. Open threshold is %.1f' 
+            print('Under openset test mode. Open threshold is %.1f'
                   % self.training_opt['open_threshold'])
- 
+
         torch.cuda.empty_cache()
 
         # In validation or testing mode, set model to eval() and initialize running loss/correct
@@ -553,7 +552,7 @@ class model ():
             with torch.set_grad_enabled(False):
 
                 # In validation or testing
-                self.batch_forward(inputs, labels, 
+                self.batch_forward(inputs, labels,
                                    centroids=self.memory['centroids'],
                                    phase=phase)
                 if not get_feat_only:
@@ -580,51 +579,51 @@ class model ():
             print('===> Saving feats to ' + fname)
             with open(fname, 'wb') as f:
                 pickle.dump({
-                             'feats': np.concatenate(feats_all),
-                             'labels': np.concatenate(labels_all),
-                             'idxs': np.concatenate(idxs_all),
-                            },
-                            f, protocol=4) 
-            return 
+                    'feats': np.concatenate(feats_all),
+                    'labels': np.concatenate(labels_all),
+                    'idxs': np.concatenate(idxs_all),
+                },
+                    f, protocol=4)
+            return
         probs, preds = F.softmax(self.total_logits.detach(), dim=1).max(dim=1)
 
         if openset:
             preds[probs < self.training_opt['open_threshold']] = -1
             self.openset_acc = mic_acc_cal(preds[self.total_labels == -1],
-                                            self.total_labels[self.total_labels == -1])
+                                           self.total_labels[self.total_labels == -1])
             print('\n\nOpenset Accuracy: %.3f' % self.openset_acc)
 
         # Calculate the overall accuracy and F measurement
-        self.eval_acc_mic_top1= mic_acc_cal(preds[self.total_labels != -1],
-                                            self.total_labels[self.total_labels != -1])
+        self.eval_acc_mic_top1 = mic_acc_cal(preds[self.total_labels != -1],
+                                             self.total_labels[self.total_labels != -1])
         self.eval_f_measure = F_measure(preds, self.total_labels, openset=openset,
                                         theta=self.training_opt['open_threshold'])
         self.many_acc_top1, \
         self.median_acc_top1, \
         self.low_acc_top1, \
         self.cls_accs = shot_acc(preds[self.total_labels != -1],
-                                 self.total_labels[self.total_labels != -1], 
+                                 self.total_labels[self.total_labels != -1],
                                  self.data['train'],
                                  acc_per_cls=True)
         # Top-1 accuracy and additional string
         print_str = ['\n\n',
-                     'Phase: %s' 
+                     'Phase: %s'
                      % (phase),
                      '\n\n',
-                     'Evaluation_accuracy_micro_top1: %.3f' 
+                     'Evaluation_accuracy_micro_top1: %.3f'
                      % (self.eval_acc_mic_top1),
                      '\n',
-                     'Averaged F-measure: %.3f' 
+                     'Averaged F-measure: %.3f'
                      % (self.eval_f_measure),
                      '\n',
-                     'Many_shot_accuracy_top1: %.3f' 
+                     'Many_shot_accuracy_top1: %.3f'
                      % (self.many_acc_top1),
-                     'Median_shot_accuracy_top1: %.3f' 
+                     'Median_shot_accuracy_top1: %.3f'
                      % (self.median_acc_top1),
-                     'Low_shot_accuracy_top1: %.3f' 
+                     'Low_shot_accuracy_top1: %.3f'
                      % (self.low_acc_top1),
                      '\n']
-        
+
         rsl = {phase + '_all': self.eval_acc_mic_top1,
                phase + '_many': self.many_acc_top1,
                phase + '_median': self.median_acc_top1,
@@ -645,16 +644,16 @@ class model ():
             else:
                 print(*print_str)
                 print(*acc_str)
-        
+
         if phase == 'test':
             with open(os.path.join(self.training_opt['log_dir'], 'cls_accs.pkl'), 'wb') as f:
                 pickle.dump(self.cls_accs, f)
         return rsl
-            
+
     def centroids_cal(self, data, save_all=False):
 
         centroids = torch.zeros(self.training_opt['num_classes'],
-                                   self.training_opt['feature_dim']).cuda()
+                                self.training_opt['feature_dim']).cuda()
 
         print('Calculating centroids.')
 
@@ -680,7 +679,7 @@ class model ():
                     feats_all.append(self.features.cpu().numpy())
                     labels_all.append(labels.cpu().numpy())
                     idxs_all.append(idxs.numpy())
-        
+
         if save_all:
             fname = os.path.join(self.training_opt['log_dir'], 'feats_all.pkl')
             with open(fname, 'wb') as f:
@@ -715,20 +714,21 @@ class model ():
 
                 feats_all.append(self.features.cpu().numpy())
                 labels_all.append(labels.cpu().numpy())
-        
+
         feats = np.concatenate(feats_all)
         labels = np.concatenate(labels_all)
 
         featmean = feats.mean(axis=0)
 
         def get_centroids(feats_, labels_):
-            centroids = []        
+            centroids = []
             for i in np.unique(labels_):
-                centroids.append(np.mean(feats_[labels_==i], axis=0))
+                centroids.append(np.mean(feats_[labels_ == i], axis=0))
             return np.stack(centroids)
+
         # Get unnormalized centorids
         un_centers = get_centroids(feats, labels)
-    
+
         # Get l2n centorids
         l2n_feats = torch.Tensor(feats.copy())
         norm_l2n = torch.norm(l2n_feats, 2, 1, keepdim=True)
@@ -744,9 +744,9 @@ class model ():
 
         return {'mean': featmean,
                 'uncs': un_centers,
-                'l2ncs': l2n_centers,   
+                'l2ncs': l2n_centers,
                 'cl2ncs': cl2n_centers}
-    
+
     def reset_model(self, model_state):
         for key, model in self.networks.items():
             weights = model_state[key]
@@ -757,19 +757,19 @@ class model ():
         model_dir = self.training_opt['log_dir'] if model_dir is None else model_dir
         if not model_dir.endswith('.pth'):
             model_dir = os.path.join(model_dir, 'final_model_checkpoint.pth')
-        
+
         print('Validation on the best model.')
         print('Loading model from %s' % (model_dir))
-        
-        checkpoint = torch.load(model_dir)          
+
+        checkpoint = torch.load(model_dir)
         model_state = checkpoint['state_dict_best']
-        
+
         self.centroids = checkpoint['centroids'] if 'centroids' in checkpoint else None
-        
+
         for key, model in self.networks.items():
             # if not self.test_mode and key == 'classifier':
             if not self.test_mode and \
-                'DotProductClassifier' in self.config['networks'][key]['def_file']:
+                    'DotProductClassifier' in self.config['networks'][key]['def_file']:
                 # Skip classifier initialization 
                 print('Skiping classifier initialization')
                 continue
@@ -778,7 +778,7 @@ class model ():
             x = model.state_dict()
             x.update(weights)
             model.load_state_dict(x)
-    
+
     def save_latest(self, epoch):
         model_weights = {}
         model_weights['feat_model'] = copy.deepcopy(self.networks['feat_model'].state_dict())
@@ -789,28 +789,28 @@ class model ():
             'state_dict': model_weights
         }
 
-        model_dir = os.path.join(self.training_opt['log_dir'], 
+        model_dir = os.path.join(self.training_opt['log_dir'],
                                  'latest_model_checkpoint.pth')
         torch.save(model_states, model_dir)
-        
-    def save_model(self, epoch, best_epoch, best_model_weights, best_acc, centroids=None):
-        
-        model_states = {'epoch': epoch,
-                'best_epoch': best_epoch,
-                'state_dict_best': best_model_weights,
-                'best_acc': best_acc,
-                'centroids': centroids}
 
-        model_dir = os.path.join(self.training_opt['log_dir'], 
+    def save_model(self, epoch, best_epoch, best_model_weights, best_acc, centroids=None):
+
+        model_states = {'epoch': epoch,
+                        'best_epoch': best_epoch,
+                        'state_dict_best': best_model_weights,
+                        'best_acc': best_acc,
+                        'centroids': centroids}
+
+        model_dir = os.path.join(self.training_opt['log_dir'],
                                  'final_model_checkpoint.pth')
 
         torch.save(model_states, model_dir)
-            
+
     def output_logits(self, openset=False):
-        filename = os.path.join(self.training_opt['log_dir'], 
-                                'logits_%s'%('open' if openset else 'close'))
+        filename = os.path.join(self.training_opt['log_dir'],
+                                'logits_%s' % ('open' if openset else 'close'))
         print("Saving total logits to: %s.npz" % filename)
-        np.savez(filename, 
-                 logits=self.total_logits.detach().cpu().numpy(), 
+        np.savez(filename,
+                 logits=self.total_logits.detach().cpu().numpy(),
                  labels=self.total_labels.detach().cpu().numpy(),
                  paths=self.total_paths)
