@@ -95,8 +95,8 @@ def get_dataset(data_root, dataset,
 
     elif dataset == 'imagenet':
         data_root = os.path.join(data_root, 'imagenet')
-        txt_train = f'./dataset/imagenet/ImageNet_LT_train.txt'
-        txt_test = f'./dataset/imagenet/ImageNet_LT_test.txt'
+        txt_train = os.path.join(data_root, 'ImageNet_LT_train.txt')
+        txt_test = os.path.join(data_root, 'ImageNet_LT_test.txt')
         if transform_train is None:
             transform_train = transforms.Compose([
                 transforms.RandomResizedCrop(224),
