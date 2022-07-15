@@ -21,7 +21,7 @@ class ImageNetLT(Dataset):
     def get_cls_num_list(self):
         if not os.path.exists('cls_freq'):
             os.makedirs('cls_freq')
-        freq_path = os.path.join('cls_freq', 'ImageNet_LT.json')
+        freq_path = os.path.join('cls_freq', 'imagenet.json')
         with open(freq_path, 'w') as fd:
             json.dump(self.cls_num_list, fd)
         return self.cls_num_list
