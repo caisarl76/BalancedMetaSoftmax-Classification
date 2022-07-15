@@ -63,6 +63,7 @@ class PlacesLT(Dataset):
             self.class_data[y].append(i)
 
         self.cls_num_list = [len(self.class_data[i]) for i in range(self.num_classes)]
+        self.cls_num_list = list([int(x) for x in self.cls_num_list])
 
     def get_cls_num_list(self):
         if not os.path.exists('cls_freq'):

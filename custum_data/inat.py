@@ -16,6 +16,7 @@ class INaturalist(Dataset):
                 self.img_path.append(os.path.join(root, line.split()[0]))
                 self.targets.append(int(line.split()[1]))
         self.cls_num_list = [np.sum(np.array(self.targets) == i) for i in range(self.num_classes)]
+        self.cls_num_list = list([int(x) for x in self.cls_num_list])
 
 
     def get_cls_num_list(self):
