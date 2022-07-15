@@ -51,5 +51,9 @@ def balanced_softmax_loss(labels, logits, sample_per_class, reduction):
 
 def create_loss(freq_path):
     print('Loading Balanced Softmax Loss.')
+    if type(freq_path) == str:
+        with open(freq_path, 'r') as fd:
+            freq_path = json.load(fd)
+
     return BalancedSoftmax(freq_path)
 

@@ -3,6 +3,7 @@ import numpy as np
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from PIL import Image
+import json
 
 class ImageNetLT(Dataset):
     
@@ -15,8 +16,14 @@ class ImageNetLT(Dataset):
                 self.img_path.append(os.path.join(root, line.split()[0]))
                 self.targets.append(int(line.split()[1]))
         self.cls_num_list = [np.sum(np.array(self.targets) == i) for i in range(1000)]
+        self.cls_num_list = list([int(x) for x in self.cls_num_list])
 
     def get_cls_num_list(self):
+        if not os.path.exists('cls_freq'):
+            os.makedirs('cls_freq')
+        freq_path = os.path.join('cls_freq', 'ImageNet_LT.json')
+        with open(freq_path, 'w') as fd:
+            json.dump(self.cls_num_list, fd)
         return self.cls_num_list
 
     def __len__(self):

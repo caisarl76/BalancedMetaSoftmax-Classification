@@ -5,6 +5,7 @@ from torchvision import transforms
 import os
 from PIL import Image
 from tqdm import tqdm
+import json
 
 RGB_statistics = {
     'iNaturalist18': {
@@ -64,6 +65,11 @@ class PlacesLT(Dataset):
         self.cls_num_list = [len(self.class_data[i]) for i in range(self.num_classes)]
 
     def get_cls_num_list(self):
+        if not os.path.exists('cls_freq'):
+            os.makedirs('cls_freq')
+        freq_path = os.path.join('cls_freq', 'places_LT.json')
+        with open(freq_path, 'w') as fd:
+            json.dump(self.cls_num_list, fd)
         return self.cls_num_list
 
     def __len__(self):
