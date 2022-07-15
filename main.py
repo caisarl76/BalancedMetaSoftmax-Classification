@@ -22,8 +22,8 @@ import yaml
 from utils import source_import, get_value
 
 
-data_root = {'ImageNet': './dataset/ImageNet',
-             'Places': './dataset/Places-LT',
+data_root = {'ImageNet': './dataset/imaenet',
+             'Places': './dataset/places',
              'iNaturalist18': '/checkpoint/bykang/iNaturalist18',
              'CIFAR10': './dataset/',
              'CIFAR100': './dataset/',
