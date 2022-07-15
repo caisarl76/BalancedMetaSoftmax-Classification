@@ -165,7 +165,7 @@ class model():
         for key, val in criterion_defs.items():
             def_file = val['def_file']
             loss_args = list(val['loss_params'].values())
-
+            print(*loss_args)
             self.criterions[key] = source_import(def_file).create_loss(*loss_args).cuda()
             self.criterion_weights[key] = val['weight']
 
