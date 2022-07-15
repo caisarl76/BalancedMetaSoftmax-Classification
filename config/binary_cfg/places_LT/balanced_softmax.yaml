@@ -15,7 +15,7 @@ networks:
     def_file: ./models/DotProductClassifier.py
     optim_params: {lr: 0.2, momentum: 0.9, weight_decay: 0.0005}
     params: {dataset: places, feat_dim: 1024, log_dir: ./logs/binary/places/models/balanced_softmax_reactnet,
-      num_classes: 1000, stage1_weights: false}
+      num_classes: 365, stage1_weights: false}
   feat_model:
     def_file: ./models/reactnet.py
     fix: false
@@ -25,13 +25,13 @@ networks:
 shuffle: false
 training_opt:
   backbone: reactnet
-  batch_size: 512
+  batch_size: 256
   dataset: places
   display_step: 10
   feature_dim: 1024
   log_dir: ./logs/binary/places/models/balanced_softmax_reactnet
   log_root: /logs/binary/places
-  num_classes: 1000
+  num_classes: 365
   num_epochs: 90
   num_workers: 12
   open_threshold: 0.1
