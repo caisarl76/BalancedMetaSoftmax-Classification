@@ -9,7 +9,7 @@ criterions:
 endlr: 0.0
 last: false
 memory: {centroids: false, init_centroids: false}
-model_dir: ./logs/binary/imagenet/models/reactnet
+model_dir: ./logs/imagenet/imagenet/models/balanced_softmax_reactnet/adam/lr_0.01/
 networks:
   classifier:
     def_file: ./models/DotProductClassifier.py
