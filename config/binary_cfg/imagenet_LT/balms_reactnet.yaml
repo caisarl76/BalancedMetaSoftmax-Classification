@@ -21,7 +21,7 @@ networks:
     fix: true
     optim_params: {lr: 0.2, momentum: 0.9, weight_decay: 0.0005}
     params: {dataset: imagenet, dropout: null, log_dir: ./logs/binary/imagenet/clslearn/balms_reactnet,
-      stage1_weights: false, use_fc: false, use_selfatt: false}
+      stage1_weights: false, use_fc: false}
 shuffle: false
 training_opt:
   backbone: resnet10
