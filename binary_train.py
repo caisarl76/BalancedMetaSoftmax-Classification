@@ -156,7 +156,7 @@ if not test_mode:
     else:
         cbs_sampler_dic = None
         meta = False
-    if training_opt['dataset'] in ['imagenet', 'places', 'inat']:
+    if training_opt['dataset'] in ['imagenet_LT', 'places_LT', 'inat_LT']:
         training_opt['num_workers'] = 16
         training_opt['imb_ratio'] = None
     data = get_dataset(data_root='./dataset',
