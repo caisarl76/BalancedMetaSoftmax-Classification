@@ -69,11 +69,11 @@ def update(config, args):
     config['networks']['classifier']['optim_params']['lr'] = args.lr
     config['networks']['feat_model']['optim_params']['lr'] = args.lr
 
-    if config['model_dir']:
-        config['model_dir'] = os.path.join(config['model_dir'],
-                                           config['optimizer'],
-                                           ('lr_' + (str)(args.lr))
-                                           )
+    # if config['model_dir']:
+    #     config['model_dir'] = os.path.join(config['model_dir'],
+    #                                        config['optimizer'],
+    #                                        ('lr_' + (str)(args.lr))
+    #                                        )
     config['training_opt']['log_dir'] = os.path.join(config['training_opt']['log_dir'],
                                                      config['optimizer'],
                                                      ('lr_' + (str)(args.lr))
