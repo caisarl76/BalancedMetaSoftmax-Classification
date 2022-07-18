@@ -25,7 +25,7 @@ networks:
 shuffle: false
 training_opt:
   backbone: resnet10
-  batch_size: 16
+  batch_size: 256
   dataset: inat_LT
   display_step: 10
   feature_dim: 1024
