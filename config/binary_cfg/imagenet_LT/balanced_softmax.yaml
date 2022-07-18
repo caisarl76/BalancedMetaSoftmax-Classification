@@ -1,4 +1,4 @@
-optimizer: adam
+optimizer: adamCUDA_VISIBLE_DEVICES=1 python binary_train.py --cfg ./config/binary_cfg/inat_LT/balanced_softmax.yaml --dataset inat --lr 0.01
 coslr: true
 criterions:
   PerformanceLoss:
