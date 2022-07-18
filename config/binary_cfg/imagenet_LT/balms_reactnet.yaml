@@ -24,7 +24,7 @@ networks:
       stage1_weights: false, use_fc: false}
 shuffle: false
 training_opt:
-  backbone: resnet10
+  backbone: reactnet
   batch_size: 256
   dataset: ImageNet_LT
   display_step: 10
