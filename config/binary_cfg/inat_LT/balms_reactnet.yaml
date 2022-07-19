@@ -25,7 +25,7 @@ networks:
 shuffle: false
 training_opt:
   backbone: reactnet
-  batch_size: 256
+  batch_size: 16
   dataset: inat_LT
   display_step: 10
   feature_dim: 1024
