@@ -131,8 +131,8 @@ def get_dataset(data_root, dataset,
         )
 
     elif dataset == 'inat':
-        # data_root = os.path.join(data_root, 'inat')
-        data_root = os.path.join(data_root, 'inat2018')
+        data_root = os.path.join(data_root, 'inat')
+        # data_root = os.path.join(data_root, 'inat2018')
 
         txt_train = os.path.join(data_root, 'iNaturalist18_train.txt')
         txt_test = os.path.join(data_root, 'iNaturalist18_val.txt')
