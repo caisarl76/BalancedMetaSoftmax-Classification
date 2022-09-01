@@ -7,6 +7,7 @@ import torchvision.transforms as transforms
 import numpy as np
 import json
 from PIL import Image
+import PIL
 from .autoaugment import CIFAR10Policy, Cutout
 
 
