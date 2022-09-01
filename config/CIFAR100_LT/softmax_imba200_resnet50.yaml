@@ -17,20 +17,22 @@ model_dir: null
 networks:
   classifier:
     def_file: ./models/DotProductClassifier.py
-    optim_params: {lr: 0.05, momentum: 0.9, weight_decay: 0.0005}
-    params: {feat_dim: 64, num_classes: 100}
+    optim_params: { lr: 0.2, momentum: 0.9, weight_decay: 0.0005 }
+    params: { dataset: CIFAR100_LT, feat_dim: 2048, log_dir: ./logs/CIFAR100_LT/models/resnet50_uniform_e90,
+              num_classes: 100, stage1_weights: false }
   feat_model:
     def_file: ./models/ResNet50Feature.py
     fix: false
-    optim_params: {lr: 0.05, momentum: 0.9, weight_decay: 0.0005}
-    params: {}
+    optim_params: { lr: 0.2, momentum: 0.9, weight_decay: 0.0005 }
+    params: { dataset: CIFAR100_LT, dropout: null, log_dir: ./logs/CIFAR100_LT/models/resnet50_uniform_e90,
+              stage1_weights: false, use_fc: false, use_selfatt: false }
 shuffle: false
 training_opt:
   backbone: resnet50
   batch_size: 128
   dataset: CIFAR100_LT
   display_step: 10
-  feature_dim: 64
+  feature_dim: 2048
   log_dir: ./logs/CIFAR100_LT/models/resnet50_softmax_imba200
   num_classes: 100
   num_iterations: 13000
