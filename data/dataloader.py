@@ -18,6 +18,7 @@ from torchvision import transforms
 import os
 from PIL import Image
 from data.ImbalanceCIFAR_224 import IMBALANCECIFAR10, IMBALANCECIFAR100
+from custum_data.dataset import get_dataset
 
 
 # Image statistics
@@ -105,7 +106,7 @@ class LT_Dataset(Dataset):
 
 
 # Load datasets
-def load_data(data_root, dataset, phase, batch_size, sampler_dic=None, num_workers=4, test_open=False, shuffle=True, cifar_imb_ratio=None, meta=False):
+def load_data(data_root, dataset, phase, batch_size, sampler_dic=None, num_workers=2, test_open=False, shuffle=True, cifar_imb_ratio=None, meta=False):
     if phase == 'train_plain':
         txt_split = 'train'
     else:
@@ -129,15 +130,17 @@ def load_data(data_root, dataset, phase, batch_size, sampler_dic=None, num_worke
         print('====> CIFAR100 Imbalance Ratio: ', cifar_imb_ratio)
         set_ = IMBALANCECIFAR100(phase, imbalance_ratio=cifar_imb_ratio, root=data_root)
     else:
-        rgb_mean, rgb_std = RGB_statistics[key]['mean'], RGB_statistics[key]['std']
-        if phase not in ['train', 'val']:
-            transform = get_data_transform('test', rgb_mean, rgb_std, key)
-        else:
-            transform = get_data_transform(phase, rgb_mean, rgb_std, key)
-
-        print('Use data transformation:', transform)
-
-        set_ = LT_Dataset(data_root, txt, dataset, transform, meta)
+        set_ = get_dataset(data_root=data_root, dataset=dataset, phase=phase)
+    # else:
+    #     rgb_mean, rgb_std = RGB_statistics[key]['mean'], RGB_statistics[key]['std']
+    #     if phase not in ['train', 'val']:
+    #         transform = get_data_transform('test', rgb_mean, rgb_std, key)
+    #     else:
+    #         transform = get_data_transform(phase, rgb_mean, rgb_std, key)
+    #
+    #     print('Use data transformation:', transform)
+    #
+    #     set_ = LT_Dataset(data_root, txt, dataset, transform, meta)
 
 
     print(len(set_))
