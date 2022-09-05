@@ -93,11 +93,11 @@ class ImbalanceCIFAR10(torchvision.datasets.CIFAR10):
                     for transform in self.transform:
                         sample = transform(img)
                         samples.append(sample)
-                    return samples, target
+                    return samples, target, index
 
             else:
                 sample = self.transform(img)
-                return sample, target
+                return sample, target, index
 
 class ImbalanceCIFAR100(ImbalanceCIFAR10):
     base_folder = 'cifar-100-python'

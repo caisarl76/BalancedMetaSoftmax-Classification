@@ -20,7 +20,7 @@ from run_networks import model
 import warnings
 import yaml
 from utils import source_import, get_value
-from custum_dataset.dataset import get_dataset
+from custum_data.new_dataset import get_dataset
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--cfg', default=None, type=str)
@@ -122,6 +122,10 @@ dataset = training_opt['dataset']
 if not os.path.isdir(training_opt['log_dir']):
     os.makedirs(training_opt['log_dir'])
 
+args = parser.parse_args()
+args.dataset=dataset
+
+
 pprint.pprint(config)
 
 if not test_mode:
@@ -157,22 +161,34 @@ if not test_mode:
         cbs_sampler_dic = None
         meta = False
     if training_opt['dataset'] in ['imagenet', 'places', 'inat']:
-        training_opt['num_workers'] = 16
+        training_opt['num_workers'] = 8
         training_opt['imb_ratio'] = None
-    data = get_dataset(data_root='./dataset',
+    data = {x:get_dataset(phase=x,
+                       data_root='./dataset',
                        dataset=dataset,
                        sampler_dic=sampler_dic,
                        batch_size=training_opt['batch_size'],
                        num_workers=training_opt['num_workers'],
                        imb_ratio=training_opt['imb_ratio'],
-                       meta=cbs_sampler_dic
                        )
+            for x in splits}
     args.cls_num_list = data['train'].dataset.get_cls_num_list()
-    # if 'BalancedSoftmaxLoss' in config['criterions']['PerformanceLoss']['def_file']:
-    #     config['criterions']['PerformanceLoss']['loss_params']['cls_num_list'] = \
-    #         data['train'].dataset.get_cls_num_list()
 
     if sampler_defs and sampler_defs['type'] == 'MetaSampler':  # todo: use meta-sampler
+        cbs_file = './data/ClassAwareSampler.py'
+        cbs_sampler_dic = {
+            'sampler': source_import(cbs_file).get_sampler(),
+            'params': {'is_infinite': True}
+        }
+        data['meta'] = dataloader.load_data(data_root='./dataset',
+                                            dataset=dataset, phase='train' if 'CIFAR' in dataset else 'val',
+                                            batch_size=sampler_defs.get('meta_batch_size',
+                                                                        training_opt['batch_size'], ),
+                                            sampler_dic=cbs_sampler_dic,
+                                            num_workers=training_opt['num_workers'],
+                                            cifar_imb_ratio=training_opt[
+                                                'cifar_imb_ratio'] if 'cifar_imb_ratio' in training_opt else None,
+                                            meta=True)
         training_model = model(config, data, test=False, meta_sample=True, learner=learner)
     else:
         training_model = model(config, data, test=False)
@@ -199,12 +215,16 @@ else:
 
     splits.append('train_plain')
 
-    data = get_dataset(data_root='./dataset',
-                       dataset=dataset,
-                       batch_size=training_opt['batch_size'],
-                       num_workers=training_opt['num_workers'],
-                       imb_ratio=training_opt['imb_ratio'],
-                       )
+    data = {x: dataloader.load_data(data_root='./dataset/',
+                                    dataset=dataset, phase=x,
+                                    batch_size=training_opt['batch_size'],
+                                    sampler_dic=None,
+                                    test_open=test_open,
+                                    num_workers=training_opt['num_workers'],
+                                    shuffle=False,
+                                    cifar_imb_ratio=training_opt[
+                                        'cifar_imb_ratio'] if 'cifar_imb_ratio' in training_opt else None)
+            for x in splits}
 
     training_model = model(config, data, test=True)
     # training_model.load_model()

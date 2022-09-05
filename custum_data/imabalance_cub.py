@@ -98,7 +98,7 @@ class Cub2011(Dataset):
                 return samples, target
             else:
                 img = self.transform(img)
-                return img, target
+                return img, target, idx
 
 
 
