@@ -22,7 +22,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 import torch.distributed as dist
 
-from custum_dataset.new_dataset import get_dataset
+from custum_data.new_dataset import get_dataset
 
 from utils.utils import *
 from utils.scheduler import GradualWarmupScheduler

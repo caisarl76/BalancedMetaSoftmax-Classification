@@ -57,11 +57,11 @@ class ImageNetLT(Dataset):
                     for transform in self.transform:
                         sample = transform(img)
                         samples.append(sample)
-                    return samples, label
+                    return samples, label, index
             else:
                 sample = self.transform(img)
 
-        return sample, label  # , index
+        return sample, label, index
 
     def sort_dataset(self, new_class_idx_sorted=None):
         idx = np.argsort(self.targets)

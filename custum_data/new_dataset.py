@@ -8,7 +8,7 @@ import numpy as np
 import torch.optim
 from matplotlib import pyplot as plt
 from torchvision import datasets, transforms
-from custum_dataset.randaugment import rand_augment_transform
+from custum_data.randaugment import rand_augment_transform
 
 if __name__ == '__main__':
     from fruits import Fruits
@@ -71,94 +71,90 @@ smooth_dict = {
     'imagenet': [0.3, 0.0],
     'inat': [0.3, 0.0],
 }
+
+
 def dataset_info(args):
     args.num_classes, args.head_class_idx, args.med_class_idx, args.tail_class_idx, MEAN, STD, data_class \
         = class_dict[args.dataset]
     return args, MEAN, STD, data_class
 
-def get_dataset(args, train_img_size=224, val_img_size=224, random_seed=True):
-    if '_' in args.dataset:
-        args.dataset = args.dataset.split('_')[0]
-    args.num_classes, args.head_class_idx, args.med_class_idx, args.tail_class_idx, MEAN, STD, data_class \
-        = class_dict[args.dataset]
 
-    transform_train = []
-    ra_param_list = None
-    if isinstance(train_img_size, list) or isinstance(train_img_size, tuple):
-        for img_size in train_img_size:
-            transform_train.append(transforms.Compose([transforms.RandomResizedCrop(img_size)]))
-        for trans in transform_train:
-            trans.transforms.append(transforms.RandomHorizontalFlip())
-            if not 'cifar10' in args.dataset:
-                trans.transforms.append(transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0))
-            trans.transforms.append(transforms.ToTensor())
-            trans.transforms.append(transforms.Normalize(mean=MEAN, std=STD))
-    else:
-        if 'cifar10' in args.dataset:
-            transform_train = transforms.Compose([
-                transforms.RandomResizedCrop(train_img_size),
-                transforms.RandomHorizontalFlip(),
-                transforms.ToTensor(),
-                transforms.Normalize(mean=MEAN, std=STD)
-            ])
-        else:
-            transform_train = transforms.Compose([
-                transforms.RandomResizedCrop(train_img_size),
-                transforms.RandomHorizontalFlip(),
-                transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0),
-                transforms.ToTensor(),
-                transforms.Normalize(mean=MEAN, std=STD)
-            ])
+def get_dataset(phase, data_root='./dataset', dataset='cub', sampler_dic=None, batch_size=128, num_workers=2,
+                imb_ratio=0.1, random_seed=None):
+    if '_' in dataset:
+        dataset = dataset.split('_')[0]
+    _, _, _, _, MEAN, STD, data_class = class_dict[dataset]
 
-    # print(transform_train)
-    val_transform = []
-    if isinstance(val_img_size, list) or isinstance(val_img_size, tuple):
-        for img_size in val_img_size:
-            val_transform.append(
-                [transforms.Resize(int(math.floor(img_size / 0.875))),
-                 transforms.CenterCrop(img_size)
-                 ])
-        for i, trans in enumerate(val_transform):
-            trans.append(transforms.ToTensor())
-            trans.append(transforms.Normalize(mean=MEAN, std=STD))
-            val_transform[i] = transforms.Compose(trans)
-    else:
-        val_transform = transforms.Compose([
-            transforms.Resize(int(math.floor(val_img_size / 0.875))),
-            transforms.CenterCrop(val_img_size),
+    if 'cifar10' in dataset:
+        transform_train = transforms.Compose([
+            transforms.RandomResizedCrop(224),
+            transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize(mean=MEAN, std=STD)
         ])
-    root = os.path.join(os.getcwd(), args.data)
+    else:
+        transform_train = transforms.Compose([
+            transforms.RandomResizedCrop(224),
+            transforms.RandomHorizontalFlip(),
+            transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=MEAN, std=STD)
+        ])
+
+    # print(transform_train)
+    val_transform = transforms.Compose([
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=MEAN, std=STD)
+    ])
+    # root = os.path.join(data_root, dataset)
     # print(val_transform)
 
-    if args.dataset in ['places', 'imagenet', 'inat']:
-        train_dataset = data_class(root=root,
+    if dataset in ['places', 'imagenet', 'inat']:
+        train_dataset = data_class(root=data_root,
                                    train=True,
                                    transform=transform_train,
                                    random_seed=random_seed)
     else:
-        train_dataset = data_class(root=root,
-                                   imb_factor=args.imb_ratio,
+        train_dataset = data_class(root=data_root,
+                                   imb_factor=imb_ratio,
                                    train=True,
                                    transform=transform_train,
-                                   random_seed=random_seed,)
-    if ra_param_list:
-        train_dataset.set_raparam(ra_param_list)
+                                   random_seed=random_seed, )
 
-    if args.dataset in ['cars', 'dogs', 'fruits']:
+    if dataset in ['cars', 'dogs', 'fruits']:
         new_class_idx = train_dataset.get_new_class_idx_sorted()
-        val_dataset = data_class(root=root,
+        val_dataset = data_class(root=data_root,
                                  train=False,
                                  transform=val_transform,
                                  new_class_idx_sorted=new_class_idx)
     else:
-        val_dataset = data_class(root=root,
+        val_dataset = data_class(root=data_root,
                                  train=False,
                                  transform=val_transform)
 
-    return train_dataset, val_dataset
-
+    if sampler_dic and phase == 'train' and sampler_dic.get('batch_sampler', False):
+        print('Using sampler: ', sampler_dic['sampler'])
+        data_loader = torch.utils.data.DataLoader(dataset=train_dataset,
+                                                  batch_sampler=sampler_dic['sampler'](dataset,
+                                                                                       **sampler_dic['params']),
+                                                  num_workers=num_workers)
+    elif sampler_dic and phase == 'train':
+        print('Using sampler: ', sampler_dic['sampler'])
+        print('Sampler parameters: ', sampler_dic['params'])
+        data_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False,
+                                                  sampler=sampler_dic['sampler'](dataset, **sampler_dic['params']),
+                                                  num_workers=num_workers)
+    else:
+        if phase in ['val', 'test']:
+            dataset = val_dataset
+        else:
+            dataset = train_dataset
+        data_loader = torch.utils.data.DataLoader(
+            dataset, batch_size=batch_size, shuffle=True if phase in ['val', 'test'] else False,
+            num_workers=num_workers)
+    return data_loader
 
 
 if __name__ == '__main__':

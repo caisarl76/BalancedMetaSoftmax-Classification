@@ -132,13 +132,13 @@ class ImbalanceCaltech101(VisionDataset):
                     for transform in self.transform:
                         sample = transform(img)
                         samples.append(sample)
-                    return samples, target
+                    return samples, target, index
             else:
                 img = self.transform(img)
         if self.target_transform is not None:
             target = self.target_transform(target)
 
-        return img, target
+        return img, target, index
 
     def _check_integrity(self):
         # can be more robust and check hash of files

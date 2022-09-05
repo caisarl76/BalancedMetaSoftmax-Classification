@@ -71,11 +71,11 @@ class INaturalist(Dataset):
                     for transform in self.transform:
                         sample = transform(img)
                         samples.append(sample)
-                    return samples, label
+                    return samples, label, index
             else:
                 sample = self.transform(img)
 
-        return sample, label  # , index
+        return sample, label , index
 
 if __name__ == '__main__':
     train_transform = transforms.Compose([

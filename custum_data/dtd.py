@@ -11,7 +11,7 @@ from PIL import Image
 from matplotlib import pyplot as plt
 from torch.utils.data import Dataset
 from torchvision import transforms
-from custum_dataset.randaugment import rand_augment_transform
+from custum_data.randaugment import rand_augment_transform
 
 class DTD(Dataset):
     def __init__(self, root, train=True, download=False, transform=None, rand_number=0, imb_factor=0.1, imb_type='exp', random_seed=False, ra_params=None):
@@ -112,26 +112,6 @@ class DTD(Dataset):
         target = self.targets[index]
         target = torch.tensor(target).long()
 
-        if self.hard_aug:
-            classwise = 1 - (0.5 * self.factor[target])
-            n = (int)(self.step * classwise)
-            if type(self.transform) == list:
-                samples = []
-                for i, resol in enumerate([480, 224, 128]):
-                    ra_param = self.ra_params[i]
-                    transform = transforms.Compose([
-                        transforms.RandomResizedCrop(resol, scale=(0.08, 1.)),
-                        transforms.RandomHorizontalFlip(),
-                        transforms.RandomApply([
-                            transforms.ColorJitter(0.4, 0.4, 0.4, 0.0)
-                        ], p=1.0),
-                        rand_augment_transform('rand-n{}-m{}-mstd{}'.format(n, 2, 0.5), ra_param),
-                        transforms.ToTensor(),
-                        transforms.Normalize(mean=[0.4707, 0.4601, 0.4550], std=[0.2667, 0.2658, 0.2706]),
-                    ])
-                    samples.append(transform(img))
-                return samples, target
-
         if self.transform is not None:
             if isinstance(self.transform, list):
                 if type(self.transform) == list:
@@ -139,7 +119,8 @@ class DTD(Dataset):
                     for transform in self.transform:
                         sample = transform(img)
                         samples.append(sample)
-                    return samples, target
+                    return samples, target, index
+
             else:
                 img = self.transform(img)
         if isinstance(img, list):
@@ -152,7 +133,7 @@ class DTD(Dataset):
             if img.shape == torch.Size([1, 224, 224]):
                 img = img.repeat(3, 1, 1)
 
-        return img, target
+        return img, target, index
 
 
 class MyData(Dataset):

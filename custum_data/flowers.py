@@ -5,108 +5,55 @@ import numpy as np
 import pandas as pd
 import torch
 import torchvision
-from tqdm import tqdm
+import tqdm
 from PIL import Image
 from matplotlib import pyplot as plt
-from torchvision.datasets.vision import VisionDataset
+from torch.utils.data import Dataset
+from torchvision import transforms
+import os
+import random
+
+import numpy as np
+import pandas as pd
+import torch
+import torchvision
+import tqdm
+from PIL import Image
+from matplotlib import pyplot as plt
+from torch.utils.data import Dataset
 from torchvision import transforms
 
 
-class Fruits(VisionDataset):
-    def __init__(self, root, train=True, extensions=None, transform=None,
-                 target_transform=None, imb_factor=1, imb_type='exp', new_class_idx_sorted=None, random_seed=False):
+class Flowers(Dataset):
+    def __init__(self, root, train=True, download=False, transform=None, rand_number=0, imb_factor=1, imb_type='exp', random_seed=False):
+        np.random.seed(rand_number)
         self.random_seed = random_seed
-        root = os.path.join(root, 'fruits')
+        root = os.path.join(root, 'flowers')
         if train:
-            root = os.path.join(root, 'Training')
+            excel_file = os.path.join(root, 'train.txt')
         else:
-            root = os.path.join(root, 'Test')
+            excel_file = os.path.join(root, 'valid.txt')
 
-        super(Fruits, self).__init__(root, transform=transform,
-                                            target_transform=target_transform)
-        classes, class_to_idx = self._find_classes(self.root)
+        self.samples = pd.read_csv(excel_file, delimiter=' ')
+        self.root_dir = root
+        self.transform = transform
+        self.targets = self.samples['TARGET'].array
+        self.classes = np.unique(self.targets)
+        self.cls_num = len(self.classes)
 
-        categories = os.listdir(root)
-        samples = []
-        for c in categories:
-            label = int(class_to_idx[c])
-            image_path = os.listdir(os.path.join(root, c))
-            for p in image_path:
-                samples.append((os.path.join(root, c, p), label))
-
-        if len(samples) == 0:
-            msg = "Found 0 files in subfolders of: {}\n".format(self.root)
-            if extensions is not None:
-                msg += "Supported extensions are: {}".format(",".join(extensions))
-            raise RuntimeError(msg)
-        self.extensions = extensions
-        self.classes = classes
-        self.cls_num = len(classes)
-        self.class_to_idx = class_to_idx
-
-        self.samples = np.array([s[0] for s in samples])
-        self.targets = np.array([s[1] for s in samples])
+        self.samples = np.array(self.samples)
+        self.targets = np.array(self.targets, dtype=np.int64)
 
         num_in_class = []
         for class_idx in np.unique(self.targets):
             num_in_class.append(len(np.where(self.targets == class_idx)[0]))
         self.num_in_class = num_in_class
-
-        self.sort_dataset(new_class_idx_sorted)
         if train:
             img_num_list = self.get_img_num_per_cls(self.cls_num, imb_type, imb_factor)
             self.gen_imbalanced_data(img_num_list)
 
-    def sort_dataset(self, new_class_idx_sorted=None):
-        idx = np.argsort(self.targets)
-        self.targets = self.targets[idx]
-        self.samples = self.samples[idx]
-        if new_class_idx_sorted is None:
-            new_class_idx_sorted = np.argsort(self.num_in_class)[::-1]
-        for idx, target in enumerate(self.targets):
-            self.targets[idx] = np.where(new_class_idx_sorted == target)[0]
-        idx = np.argsort(self.targets)
-        self.targets = self.targets[idx]
-        self.samples = self.samples[idx]
-        self.new_class_idx_sorted = new_class_idx_sorted
-
-    def get_new_class_idx_sorted(self):
-        return self.new_class_idx_sorted
-
-    def __getitem__(self, index):
-        # edit
-        path = self.samples[index]
-        target = self.targets[index]
-
-        img = Image.open(path)
-
-        if self.transform:
-            if isinstance(self.transform, list):
-                if type(self.transform) == list:
-                    samples = []
-                    for transform in self.transform:
-                        sample = transform(img)
-                        samples.append(sample)
-                    return samples, target
-            else:
-                sample = self.transform(img)
-        if self.target_transform is not None:
-            target = self.target_transform(target)
-
-        # edit
-        return sample, target
-
-    def _find_classes(self, dir):
-        classes = [d.name for d in os.scandir(dir) if d.is_dir()]
-        classes.sort()
-        class_to_idx = {cls_name: i for i, cls_name in enumerate(classes)}
-        return classes, class_to_idx
-
-    def __len__(self):
-        return len(self.samples)
-
     def get_img_num_per_cls(self, cls_num, imb_type, imb_factor):
-        img_max = max(sorted(self.num_in_class)[::-1][1:])
+        img_max = len(self.samples) / cls_num
         img_num_per_cls = []
         if imb_type == 'exp':
             for cls_idx in range(cls_num):
@@ -135,7 +82,7 @@ class Fruits(VisionDataset):
             self.num_per_cls_dict[the_class] = len(selec_idx)
             new_data.append(self.samples[selec_idx])
             new_targets.extend([the_class, ] * the_img_num)
-        new_data = np.hstack(new_data)
+        new_data = np.vstack(new_data)
         self.samples = new_data
         self.targets = new_targets
         self.labels = new_targets
@@ -145,6 +92,25 @@ class Fruits(VisionDataset):
         for i in range(self.cls_num):
             cls_num_list.append(self.num_per_cls_dict[i])
         return cls_num_list
+
+    def __len__(self):
+        return len(self.samples)
+
+    def __getitem__(self, index):
+        img_path = os.path.join(self.root_dir, self.samples[index, 0])
+        y_label = torch.tensor(self.samples[index, 1]).long()
+        image = Image.open(img_path)
+        if self.transform:
+            if isinstance(self.transform, list):
+                if type(self.transform) == list:
+                    samples = []
+                    for transform in self.transform:
+                        sample = transform(image)
+                        samples.append(sample)
+                    return samples, y_label, index
+            else:
+                image = self.transform(image)
+        return (image, y_label, index)
 
 if __name__ == '__main__':
     train_transform = transforms.Compose([
@@ -167,9 +133,8 @@ if __name__ == '__main__':
     #     plt.clf()
     #     plt.imshow(torchvision.utils.make_grid(images, normalize=True).permute(1, 2, 0))
     #     plt.savefig(f'Flowers_{i}.png')
-    train_dataset = Fruits('/data', train=True, transform=train_transform, imb_factor=0.1)
-    train_dataset.get_new_class_idx_sorted()
-    test_dataset = Fruits('/data', train=False, transform=train_transform)
+    train_dataset = Flowers('/data', train=True, download=False, transform=train_transform, imb_factor=0.1)
+    test_dataset = Flowers('/data', train=False, download=False, transform=train_transform)
     # train_loader = torch.utils.data.DataLoader(
     #     train_dataset, batch_size=128, shuffle=False,
     #     num_workers=0, persistent_workers=False, pin_memory=True)
@@ -202,8 +167,8 @@ if __name__ == '__main__':
 
     mean = 0.
     std = 0.
-    classes_freq = np.zeros(24)
-    for images, y in tqdm(train_loader):
+    classes_freq = np.zeros(102)
+    for images, y in train_loader:
         batch_samples = images.size(0)  # batch size (the last batch can have smaller size!)
         images = images.view(batch_samples, images.size(1), -1)
         mean += images.mean(2).sum(0)
