@@ -11,7 +11,7 @@ from PIL import Image
 from matplotlib import pyplot as plt
 from torch.utils.data import Dataset
 from torchvision import transforms
-from dataset.randaugment import rand_augment_transform
+from custum_dataset.randaugment import rand_augment_transform
 
 class DTD(Dataset):
     def __init__(self, root, train=True, download=False, transform=None, rand_number=0, imb_factor=0.1, imb_type='exp', random_seed=False, ra_params=None):
