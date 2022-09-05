@@ -67,7 +67,6 @@ iter_dict = {
     'fgvc': 2003,
     'flowers': 588,
     'fruits': 2000,
-
 }
 
 
@@ -87,6 +86,7 @@ def update(config, args):
                                                      config['optimizer'],
                                                      ('lr_' + (str)(args.lr))
                                                      )
+    config['training_opt']['num_iterations'] = iter_dict[args.dataset]
     return config
 
 
