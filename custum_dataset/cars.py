@@ -12,7 +12,6 @@ from torchvision.datasets.folder import default_loader
 from torchvision.datasets.utils import download_url
 from torchvision.datasets.utils import extract_archive
 import tqdm
-from dataset.randaugment import rand_augment_transform
 
 class Cars(VisionDataset):
     file_list = {
@@ -158,25 +157,6 @@ class Cars(VisionDataset):
         path = os.path.join(self.root, path)
         target = torch.tensor(int(target)).long()
         image = self.loader(path)
-        if self.hard_aug:
-            classwise = 1 - (0.5 * self.factor[target])
-            n = (int)(self.step * classwise)
-            if type(self.transform) == list:
-                samples = []
-                for i, resol in enumerate([480, 224, 128]):
-                    ra_param = self.ra_params[i]
-                    transform = transforms.Compose([
-                        transforms.RandomResizedCrop(resol, scale=(0.08, 1.)),
-                        transforms.RandomHorizontalFlip(),
-                        transforms.RandomApply([
-                            transforms.ColorJitter(0.4, 0.4, 0.4, 0.0)
-                        ], p=1.0),
-                        rand_augment_transform('rand-n{}-m{}-mstd{}'.format(n, 2, 0.5), ra_param),
-                        transforms.ToTensor(),
-                        transforms.Normalize(mean=[0.4707, 0.4601, 0.4550], std=[0.2667, 0.2658, 0.2706]),
-                    ])
-                    samples.append(transform(image))
-                return samples, target
         if self.transform is not None:
             if isinstance(self.transform, list):
                 if type(self.transform) == list:
