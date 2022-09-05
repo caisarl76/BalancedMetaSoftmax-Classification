@@ -32,6 +32,9 @@ from utils.mislas import LearnableWeightScaling
 
 from models.reactnet_imagenet import reactnet as reactnet_imagenet, Classifier
 
+from run_networks import model
+from data import dataloader
+
 Dataloader = None
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', default='caltech101')
@@ -204,8 +207,11 @@ def main_worker(gpu, ngpus_per_node, args):
         args.cls_num_list = train_dataset.cls_num_list
     else:
         args.cls_num_list = train_dataset.get_cls_num_list()
+    config = {
+        'model_dir':args.teacher_path,
+    }
 
-    teacher_model = timm.create_model('resnet50', pretrained=False)
+    teacher_model = model(config, data, test=True)
     args.teacher_path = os.path.join(os.getcwd(), args.teacher_path)
     print(args.teacher_path)
     assert os.path.isfile(args.teacher_path)
