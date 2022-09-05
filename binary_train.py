@@ -59,14 +59,14 @@ num_class_dict = {
 iter_dict = {
     'cifar10': 13000,
     'cifar100': 13000,
-    'caltech101': 750,
-    'cub': 1500,
-    'dogs': 3000,
-    'cars': 2400,
-    'dtd': 1000,
-    'fgvc': 1700,
-    'flowers': 500,
-    'fruits': 2100,
+    'caltech101': 900,
+    'cub': 1760,
+    'dogs': 3629,
+    'cars': 2864,
+    'dtd': 1138,
+    'fgvc': 2003,
+    'flowers': 588,
+    'fruits': 2000,
 
 }
 
