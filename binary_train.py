@@ -11,7 +11,7 @@ this source tree.
 Copyright (c) 2019, Zhongqi Miao
 All rights reserved.
 """
-
+import math
 import os
 import argparse
 import pprint
@@ -87,6 +87,7 @@ def update(config, args):
                                                      ('lr_' + (str)(args.lr))
                                                      )
     config['training_opt']['num_iterations'] = iter_dict[args.dataset]
+    config['warmup_iterations'] = math.floor(iter_dict[args.dataset] *8 / 130)
     return config
 
 
