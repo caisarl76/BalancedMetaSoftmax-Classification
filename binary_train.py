@@ -62,18 +62,12 @@ def update(config, args):
     config['training_opt']['batch_size'] = \
         get_value(config['training_opt']['batch_size'], args.batch_size)
 
+    config['training_opt']['dataset'] = args.dataset
     config['networks']['classifier']['params']['num_classes'] = num_class_dict[args.dataset]
     config['training_opt']['num_classes'] = num_class_dict[args.dataset]
-    config['training_opt']['dataset'] = args.dataset
 
     config['networks']['classifier']['optim_params']['lr'] = args.lr
     config['networks']['feat_model']['optim_params']['lr'] = args.lr
-
-    # if config['model_dir']:
-    #     config['model_dir'] = os.path.join(config['model_dir'],
-    #                                        config['optimizer'],
-    #                                        ('lr_' + (str)(args.lr))
-    #                                        )
     config['training_opt']['log_dir'] = os.path.join(config['training_opt']['log_dir'],
                                                      config['optimizer'],
                                                      ('lr_' + (str)(args.lr))
