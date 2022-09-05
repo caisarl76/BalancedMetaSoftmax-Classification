@@ -17,12 +17,12 @@ model_dir: null
 networks:
   classifier:
     def_file: ./models/DotProductClassifier.py
-    optim_params: {lr: 0.05, momentum: 0.9, weight_decay: 0.0005}
+    optim_params: {lr: 0.01, betas: (0.9,0.999), eps: 1e-08}
     params: {feat_dim: 1024, num_classes: 100}
   feat_model:
     def_file: ./models/reactnet.py
     fix: false
-    optim_params: {lr: 0.05}
+    optim_params: {lr: 0.01, betas: (0.9,0.999), eps: 1e-08}
     params: {}
 shuffle: false
 training_opt:
@@ -39,4 +39,4 @@ training_opt:
   sampler: null
   scheduler_params: {gamma: 0.1, step_size: 3}
   sub_dir: models
-  imb_ratio: 0.01
+  imb_ratio: 0.1
