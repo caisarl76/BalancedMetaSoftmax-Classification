@@ -20,7 +20,7 @@ from run_networks import model
 import warnings
 import yaml
 from utils import source_import, get_value
-from custum_data.dataset import get_dataset
+from custum_dataset.dataset import get_dataset
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--cfg', default=None, type=str)
