@@ -1,14 +1,9 @@
-import argparse
-import math
 import os
-import random
+import argparse
 
-import PIL
-import numpy as np
+import json
 import torch.optim
-from matplotlib import pyplot as plt
 from torchvision import datasets, transforms
-from custum_data.randaugment import rand_augment_transform
 
 if __name__ == '__main__':
     from fruits import Fruits
@@ -122,6 +117,12 @@ def get_dataset(phase, data_root='./dataset', dataset='cub', sampler_dic=None, b
                                    train=True,
                                    transform=transform_train,
                                    random_seed=random_seed, )
+    if not os.path.exists('cls_freq'):
+        os.makedirs('cls_freq')
+    freq_path = os.path.join('cls_freq', dataset + '.json')
+    cls_num_list = train_dataset.get_cls_num_list()
+    with open(freq_path, 'w') as fd:
+        json.dump(cls_num_list, fd)
 
     if dataset in ['cars', 'dogs', 'fruits']:
         new_class_idx = train_dataset.get_new_class_idx_sorted()
@@ -133,6 +134,7 @@ def get_dataset(phase, data_root='./dataset', dataset='cub', sampler_dic=None, b
         val_dataset = data_class(root=data_root,
                                  train=False,
                                  transform=val_transform)
+
 
     if sampler_dic and phase == 'train' and sampler_dic.get('batch_sampler', False):
         print('Using sampler: ', sampler_dic['sampler'])
