@@ -56,6 +56,21 @@ num_class_dict = {
     'fruits': 24,
 }
 
+iter_dict = {
+    'cifar10': 13000,
+    'cifar100': 13000,
+    'caltech101': 750,
+    'cub': 1500,
+    'dogs': 3000,
+    'cars': 2400,
+    'dtd': 1000,
+    'fgvc': 1700,
+    'flowers': 500,
+    'fruits': 2100,
+
+}
+
+
 def update(config, args):
     # Change parameters
     config['model_dir'] = get_value(config['model_dir'], args.model_dir)
@@ -80,10 +95,6 @@ def update(config, args):
 with open(args.cfg) as f:
     config = yaml.load(f)
 config = update(config, args)
-
-
-
-
 
 log_dir = config['training_opt']['log_dir'].split('/')
 if config['model_dir'] is not None:
@@ -117,8 +128,7 @@ if not os.path.isdir(training_opt['log_dir']):
     os.makedirs(training_opt['log_dir'])
 
 args = parser.parse_args()
-args.dataset=dataset
-
+args.dataset = dataset
 
 pprint.pprint(config)
 
@@ -157,14 +167,14 @@ if not test_mode:
     if training_opt['dataset'] in ['imagenet', 'places', 'inat']:
         training_opt['num_workers'] = 8
         training_opt['imb_ratio'] = None
-    data = {x:get_dataset(phase=x,
-                       data_root='./dataset',
-                       dataset=dataset,
-                       sampler_dic=sampler_dic,
-                       batch_size=training_opt['batch_size'],
-                       num_workers=training_opt['num_workers'],
-                       imb_ratio=training_opt['imb_ratio'],
-                       )
+    data = {x: get_dataset(phase=x,
+                           data_root='./dataset',
+                           dataset=dataset,
+                           sampler_dic=sampler_dic,
+                           batch_size=training_opt['batch_size'],
+                           num_workers=training_opt['num_workers'],
+                           imb_ratio=training_opt['imb_ratio'],
+                           )
             for x in splits}
     args.cls_num_list = data['train'].dataset.get_cls_num_list()
 
