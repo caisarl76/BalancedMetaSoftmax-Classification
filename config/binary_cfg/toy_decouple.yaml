@@ -9,7 +9,7 @@ criterions:
 endlr: 0.0
 last: false
 memory: {centroids: false, init_centroids: false}
-model_dir: ./runs/DEFAULT/binary/softmax/adam/lr_0.1/
+model_dir: ./runs/DEFAULT/binary/softmax/adam/lr_0.01/
 networks:
   classifier:
     def_file: ./models/DotProductClassifier.py
