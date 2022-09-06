@@ -164,12 +164,12 @@ class Cars(VisionDataset):
                     for transform in self.transform:
                         sample = transform(image)
                         samples.append(sample)
-                    return samples, target
+                    return samples, target, index
             else:
                 image = self.transform(image)
         if self.target_transform is not None:
             target = self.target_transform(target)
-        return image, target
+        return image, target, index
 
     def __len__(self):
         return len(self.samples)
