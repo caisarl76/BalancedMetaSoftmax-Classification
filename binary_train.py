@@ -36,7 +36,7 @@ parser.add_argument('--save_feat', type=str, default='')
 # KNN testing parameters 
 parser.add_argument('--feat_type', type=str, default='cl2n')
 parser.add_argument('--dist_type', type=str, default='l2')
-parser.add_argument('--lr', type=float, default=0.1)
+parser.add_argument('--lr', type=float, default=0.01)
 
 args = parser.parse_args()
 
