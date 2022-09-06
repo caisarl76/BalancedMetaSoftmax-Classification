@@ -72,14 +72,14 @@ iter_dict = {
 iter_dict2 = {
     'cifar10': 2000,
     'cifar100': 2000,
-    'caltech101': 150,
-    'cub': 1760,
-    'dogs': 3629,
-    'cars': 2864,
-    'dtd': 1138,
-    'fgvc': 2003,
-    'flowers': 588,
-    'fruits': 2000,
+    'caltech101': 134,
+    'cub': 250,
+    'dogs': 540,
+    'cars': 429,
+    'dtd': 170,
+    'fgvc': 300,
+    'flowers': 88,
+    'fruits': 200,
 }
 
 
