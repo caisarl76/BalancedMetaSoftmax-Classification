@@ -88,6 +88,8 @@ def update(config, args):
                                                      )
     config['training_opt']['num_iterations'] = iter_dict[args.dataset]
     config['warmup_iterations'] = math.floor(iter_dict[args.dataset] *8 / 130)
+    if 'freq_path' in config['criterions']['PerformanceLoss']['loss_params']:
+        config['criterions']['PerformanceLoss']['loss_params']['freq_path'] = os.path.join('cls_freq', args.dataset + '.json')
     return config
 
 

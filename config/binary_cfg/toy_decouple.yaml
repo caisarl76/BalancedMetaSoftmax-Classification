@@ -9,7 +9,7 @@ criterions:
 endlr: 0.0
 last: false
 memory: {centroids: false, init_centroids: false}
-model_dir: ./runs/DEFAULT/binary/softmax/adam/lr_0.01/
+model_dir: ./runs/DEFAULT/binary/softmax/adam/lr_0.1/
 networks:
   classifier:
     def_file: ./models/DotProductClassifier.py
@@ -23,7 +23,7 @@ networks:
 shuffle: false
 training_opt:
   backbone: reactnet
-  batch_size: 256
+  batch_size: 16
   dataset: DEFAULT
   display_step: 10
   feature_dim: 1024
