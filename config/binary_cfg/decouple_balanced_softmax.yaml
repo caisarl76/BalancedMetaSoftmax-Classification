@@ -1,6 +1,6 @@
 optimizer: adam
 coslr: true
-criterions:
+criterions: criterions PerformanceLoss def_file
   PerformanceLoss:
     def_file: ./loss/BalancedSoftmaxLoss.py
     loss_params: {freq_path: None}

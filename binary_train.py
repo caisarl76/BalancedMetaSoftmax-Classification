@@ -69,6 +69,19 @@ iter_dict = {
     'fruits': 2000,
 }
 
+iter_dict2 = {
+    'cifar10': 2000,
+    'cifar100': 2000,
+    'caltech101': 150,
+    'cub': 1760,
+    'dogs': 3629,
+    'cars': 2864,
+    'dtd': 1138,
+    'fgvc': 2003,
+    'flowers': 588,
+    'fruits': 2000,
+}
+
 
 def update(config, args):
     # Change parameters
@@ -86,8 +99,12 @@ def update(config, args):
                                                      config['optimizer'],
                                                      ('lr_' + (str)(args.lr))
                                                      )
-    config['training_opt']['num_iterations'] = iter_dict[args.dataset]
-    config['warmup_iterations'] = math.floor(iter_dict[args.dataset] *8 / 130)
+    if config['criterions']['PerformanceLoss']['def_file'] ==  './loss/SoftmaxLoss.py':
+        config['training_opt']['num_iterations'] = iter_dict[args.dataset]
+        config['warmup_iterations'] = math.floor(iter_dict[args.dataset] *8 / 130)
+    else:
+        config['training_opt']['num_iterations'] = iter_dict2[args.dataset]
+
     if 'freq_path' in config['criterions']['PerformanceLoss']['loss_params']:
         config['criterions']['PerformanceLoss']['loss_params']['freq_path'] = os.path.join('cls_freq', args.dataset + '.json')
     return config
