@@ -1,5 +1,5 @@
 optimizer: adam
-coslr: false
+coslr: True
 coslrwarmup: true
 criterions:
   PerformanceLoss:
