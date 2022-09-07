@@ -99,14 +99,15 @@ def update(config, args):
                                                      config['optimizer'],
                                                      ('lr_' + (str)(args.lr))
                                                      )
-    if config['criterions']['PerformanceLoss']['def_file'] ==  './loss/SoftmaxLoss.py':
+    if config['criterions']['PerformanceLoss']['def_file'] == './loss/SoftmaxLoss.py':
         config['training_opt']['num_iterations'] = iter_dict[args.dataset]
-        config['warmup_iterations'] = math.floor(iter_dict[args.dataset] *8 / 130)
+        config['warmup_iterations'] = math.floor(iter_dict[args.dataset] * 8 / 130)
     else:
         config['training_opt']['num_iterations'] = iter_dict2[args.dataset]
 
     if 'freq_path' in config['criterions']['PerformanceLoss']['loss_params']:
-        config['criterions']['PerformanceLoss']['loss_params']['freq_path'] = os.path.join('cls_freq', args.dataset + '.json')
+        config['criterions']['PerformanceLoss']['loss_params']['freq_path'] = os.path.join('cls_freq',
+                                                                                           args.dataset + '.json')
     return config
 
 
@@ -213,9 +214,9 @@ if not test_mode:
                                             cifar_imb_ratio=training_opt[
                                                 'cifar_imb_ratio'] if 'cifar_imb_ratio' in training_opt else None,
                                             meta=True)
-        training_model = model(config, data, test=False, meta_sample=True, learner=learner)
+        training_model = model(config, data, test=False, meta_sample=True, learner=learner, shot_by_idx=True)
     else:
-        training_model = model(config, data, test=False)
+        training_model = model(config, data, test=False, shot_by_idx=True)
 
     training_model.train()
 
@@ -239,18 +240,15 @@ else:
 
     splits.append('train_plain')
 
-    data = {x: dataloader.load_data(data_root='./dataset/',
-                                    dataset=dataset, phase=x,
-                                    batch_size=training_opt['batch_size'],
-                                    sampler_dic=None,
-                                    test_open=test_open,
-                                    num_workers=training_opt['num_workers'],
-                                    shuffle=False,
-                                    cifar_imb_ratio=training_opt[
-                                        'cifar_imb_ratio'] if 'cifar_imb_ratio' in training_opt else None)
-            for x in splits}
+    data = {x: get_dataset(phase=x,
+                           data_root='./dataset',
+                           dataset=dataset,
+                           batch_size=training_opt['batch_size'],
+                           num_workers=training_opt['num_workers'],
+                           imb_ratio=training_opt['imb_ratio'],
+                           ) for x in splits}
 
-    training_model = model(config, data, test=True)
+    training_model = model(config, data, test=True, shot_by_idx=True)
     # training_model.load_model()
     training_model.load_model(args.model_dir)
     if args.save_feat in ['train_plain', 'val', 'test']:

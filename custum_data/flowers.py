@@ -48,6 +48,8 @@ class Flowers(Dataset):
         for class_idx in np.unique(self.targets):
             num_in_class.append(len(np.where(self.targets == class_idx)[0]))
         self.num_in_class = num_in_class
+        self.many_shot_idx = 36
+        self.median_shot_idx = 72
         if train:
             img_num_list = self.get_img_num_per_cls(self.cls_num, imb_type, imb_factor)
             self.gen_imbalanced_data(img_num_list)

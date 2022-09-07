@@ -47,6 +47,8 @@ class DTD(Dataset):
         self.cls_num = len(self.classes)
         self.hard_aug = False
 
+        self.many_shot_idx = 14
+        self.median_shot_idx = 33
         if train:
             img_num_list = self.get_img_num_per_cls(self.cls_num, imb_type, imb_factor)
             self.gen_imbalanced_data(img_num_list)

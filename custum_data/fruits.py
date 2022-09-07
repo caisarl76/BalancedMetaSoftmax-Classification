@@ -53,6 +53,8 @@ class Fruits(VisionDataset):
         self.num_in_class = num_in_class
 
         self.sort_dataset(new_class_idx_sorted)
+        self.many_shot_idx = 7
+        self.median_shot_idx = 14
         if train:
             img_num_list = self.get_img_num_per_cls(self.cls_num, imb_type, imb_factor)
             self.gen_imbalanced_data(img_num_list)

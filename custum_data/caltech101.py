@@ -75,6 +75,8 @@ class ImbalanceCaltech101(VisionDataset):
         if train:
             img_num_list = self.get_img_num_per_cls(self.cls_num, imb_type, imb_factor)
             self.gen_imbalanced_data(img_num_list)
+        self.many_shot_idx = 36
+        self.median_shot_idx = 72
 
     def get_img_num_per_cls(self, cls_num, imb_type, imb_factor):
         img_max = len(self.targets) / cls_num

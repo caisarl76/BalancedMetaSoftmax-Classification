@@ -31,7 +31,7 @@ import higher
 
 class model():
 
-    def __init__(self, config, data, test=False, meta_sample=False, learner=None):
+    def __init__(self, config, data, test=False, meta_sample=False, learner=None, shot_by_idx=False):
 
         self.meta_sample = meta_sample
 
@@ -66,6 +66,12 @@ class model():
         # Load pre-trained model parameters
         if 'model_dir' in self.config and self.config['model_dir'] is not None:
             self.load_model(self.config['model_dir'])
+
+        # get head, median, tail threshold
+        self.shot_by_idx = shot_by_idx
+        if shot_by_idx:
+            self.many_shot_idx = self.data['train'].dataset.many_shot_idx
+            self.median_shot_idx = self.data['train'].dataset.median_shot_idx
 
         # Under training mode, initialize training steps, optimizers, schedulers, criterions, and centroids
         if not self.test_mode:
@@ -489,9 +495,12 @@ class model():
         if len(normal_preds) > 0:
             normal_preds, normal_labels = list(map(np.concatenate, [normal_preds, normal_labels]))
             n_top1 = mic_acc_cal(normal_preds, normal_labels)
-            n_top1_many, \
-            n_top1_median, \
-            n_top1_low, = shot_acc(normal_preds, normal_labels, self.data['train'])
+            if self.shot_by_idx:
+                n_top1_many, n_top1_median, n_top1_low \
+                    = shot_acc_by_idx(normal_preds, normal_labels, self.data['train'],
+                                      many_shot_idx=self.many_shot_idx, median_shot_idx=self.median_shot_idx)
+            else:
+                n_top1_many, n_top1_median, n_top1_low, = shot_acc(normal_preds, normal_labels, self.data['train'])
             rsl['train_all'] += len(normal_preds) / n_total * n_top1
             rsl['train_many'] += len(normal_preds) / n_total * n_top1_many
             rsl['train_median'] += len(normal_preds) / n_total * n_top1_median
@@ -598,13 +607,14 @@ class model():
                                              self.total_labels[self.total_labels != -1])
         self.eval_f_measure = F_measure(preds, self.total_labels, openset=openset,
                                         theta=self.training_opt['open_threshold'])
-        self.many_acc_top1, \
-        self.median_acc_top1, \
-        self.low_acc_top1, \
-        self.cls_accs = shot_acc(preds[self.total_labels != -1],
-                                 self.total_labels[self.total_labels != -1],
-                                 self.data['train'],
-                                 acc_per_cls=True)
+
+        if self.shot_by_idx:
+            self.many_acc_top1, self.median_acc_top1, self.low_acc_top1, self.cls_accs = shot_acc_by_idx(preds[self.total_labels != -1], self.total_labels[self.total_labels != -1],
+                                                                     self.data['train'], many_shot_idx=self.many_shot_idx, median_shot_idx=self.median_shot_idx, acc_per_cls=True)
+        else:
+            self.many_acc_top1, self.median_acc_top1, self.low_acc_top1, self.cls_accs = \
+                shot_acc(preds[self.total_labels != -1], self.total_labels[self.total_labels != -1], self.data['train'],
+                         acc_per_cls=True)
         # Top-1 accuracy and additional string
         print_str = ['\n\n',
                      'Phase: %s'

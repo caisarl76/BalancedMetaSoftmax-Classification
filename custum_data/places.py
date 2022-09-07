@@ -72,7 +72,8 @@ class PlacesLT(Dataset):
         for i in range(len(self.targets)):
             y = self.targets[i]
             self.class_data[y].append(i)
-
+        self.many_shot_idx = 131
+        self.median_shot_idx = 259
         self.cls_num_list = [len(self.class_data[i]) for i in range(self.num_classes)]
 
     def sort_dataset(self, new_class_idx_sorted=None):
