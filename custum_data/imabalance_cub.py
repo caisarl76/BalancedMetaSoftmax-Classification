@@ -27,6 +27,8 @@ class Cub2011(Dataset):
         self.img_num_list = self.get_img_num_per_cls(200, imb_type, imb_factor)
         self.gen_imbalanced_data()
         self.hard_aug = False
+        self.many_shot_idx = 72
+        self.median_shot_idx = 142
 
     def get_img_num_per_cls(self, cls_num, imb_type, imb_factor):
         img_max = 30

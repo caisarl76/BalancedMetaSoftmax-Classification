@@ -52,6 +52,8 @@ class Aircraft(VisionDataset):
         self.classes = classes
         self.class_to_idx = class_to_idx
         self.cls_num = len(self.classes)
+        self.many_shot_idx = 36
+        self.median_shot_idx = 71
         if train:
             img_num_list = self.get_img_num_per_cls(self.cls_num, imb_type, imb_factor)
             self.gen_imbalanced_data(img_num_list)

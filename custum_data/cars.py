@@ -72,6 +72,8 @@ class Cars(VisionDataset):
         # print(self.class_names)
         self.classes = np.unique(self.targets)
         self.cls_num = len(self.classes)
+        self.many_shot_idx = 70
+        self.median_shot_idx = 139
         if train:
             img_num_list = self.get_img_num_per_cls(self.cls_num, imb_type, imb_factor)
             self.gen_imbalanced_data(img_num_list)
