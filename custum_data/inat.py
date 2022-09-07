@@ -35,7 +35,8 @@ class INaturalist(Dataset):
         self.num_in_class = num_in_class
 
         # self.sort_dataset(new_class_idx_sorted)
-
+        self.many_shot_idx = 842
+        self.median_shot_idx = 4543
         self.cls_num_list = [np.sum(np.array(self.targets) == i) for i in range(self.num_classes)]
 
     def sort_dataset(self, new_class_idx_sorted=None):

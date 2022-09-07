@@ -27,7 +27,7 @@ training_opt:
   dataset: DEFAULT
   display_step: 10
   feature_dim: 1024
-  log_dir: ./logs/DEFAULT/clslearn/reactnet_decouple_balanced_softmax
+  log_dir: ./runs/DEFAULT/clslearn/reactnet_decouple_balanced_softmax
   num_classes: 100
   num_iterations: 2000
   num_workers: 2
