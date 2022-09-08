@@ -93,6 +93,8 @@ def main():
     args.dataset = teacher_opts[2]
     if '_' in args.dataset:
         args.dataset, args.imb_ratio = args.dataset.split('_')
+    elif args.dataset == 'fruits':
+        args.imb_ratio = 0.01
     else:
         args.imb_ratio = 0.1
 
