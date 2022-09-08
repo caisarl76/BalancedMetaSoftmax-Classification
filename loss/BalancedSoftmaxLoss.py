@@ -28,7 +28,7 @@ class BalancedSoftmax(_Loss):
         freq = torch.tensor(cls_num_list)
         self.sample_per_class = freq
 
-    def forward(self, input, label, reduction='mean'):
+    def forward(self, label, input, reduction='mean'):
         return balanced_softmax_loss(label, input, self.sample_per_class, reduction)
 
 
@@ -56,4 +56,8 @@ def create_loss(freq_path):
             freq_path = json.load(fd)
 
     return BalancedSoftmax(freq_path)
+
+def create_loss_w_list(cls_num_list=None):
+    print('Loading Balanced Softmax Loss.')
+    return BalancedSoftmax(cls_num_list).cuda()
 
