@@ -78,7 +78,7 @@ parser.add_argument('--mark', default='tmp', type=str,
                     help='log dir')
 parser.add_argument('--num_classes', default=200, type=int, help='num classes in dataset')
 parser.add_argument('--img_size', type=int, default=224)
-parser.add_argument('-T', type=float, default=2.0)
+parser.add_argument('-T', type=float, default=6.0)
 parser.add_argument('--tau', type=float, default=2.0)
 parser.add_argument('--alpha', type=float, default=0.5)
 parser.add_argument('--balms_T', type=str, default=None)  # use this as balms teacher path
