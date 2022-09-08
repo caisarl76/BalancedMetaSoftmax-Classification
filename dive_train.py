@@ -15,7 +15,7 @@ import torch.optim
 import torch.utils.data
 from torch.utils.tensorboard import SummaryWriter
 
-from custum_data.new_dataset import get_dataset
+from custum_data.new_dataset import get_dataset, dataset_info
 
 from loss.BalancedSoftmaxLoss import create_loss_w_list
 
@@ -118,6 +118,7 @@ def main():
         json.dump(args.__dict__, f, indent=2)
     print('exp save on: ', args.root_path)
 
+    dataset_info(args)
     train_loader = get_dataset(phase='train', data_root='./dataset', dataset=args.dataset,
                                 batch_size=args.batch_size, num_workers=args.workers, imb_ratio=args.imb_ratio)
     val_loader = get_dataset(phase='val', data_root='./dataset', dataset=args.dataset,
