@@ -315,7 +315,7 @@ def validate(val_loader, encoder, classifier, criterion, logger, args):
                 labels = labels.cuda(args.gpu, non_blocking=True)
 
             # compute output
-            output = classifier(encoder(images))
+            output, _ = classifier(encoder(images))
             loss = criterion(output, labels)
 
             total_s_out = torch.cat((total_s_out, output))
