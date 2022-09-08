@@ -83,13 +83,11 @@ parser.add_argument('--tau', type=float, default=2.0)
 parser.add_argument('--alpha', type=float, default=0.5)
 parser.add_argument('--balms_T', type=str, default=None)  # use this as balms teacher path
 
-best_acc = 0
-best_head = 0
-best_med = 0
-best_tail = 0
-
-
 def main():
+    global best_acc
+    global best_head
+    global best_med
+    global best_tail
     args = parser.parse_args()
     teacher_opts = args.teacher_path.split('/')
     args.dataset = teacher_opts[2]
