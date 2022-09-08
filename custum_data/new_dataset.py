@@ -78,7 +78,7 @@ def get_dataset(phase, data_root='./dataset', dataset='cub', sampler_dic=None, b
                 imb_ratio=0.1, random_seed=None):
     if '_' in dataset:
         dataset = dataset.split('_')[0]
-    _, _, _, _, MEAN, STD, data_class = class_dict[dataset]
+    num_classes, _, _, _, MEAN, STD, data_class = class_dict[dataset]
 
     if 'cifar10' in dataset:
         transform_train = transforms.Compose([

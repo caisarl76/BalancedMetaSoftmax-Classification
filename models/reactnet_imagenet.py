@@ -169,11 +169,9 @@ class BasicBlock(nn.Module):
 
 
 class reactnet(nn.Module):
-    def __init__(self, num_classes=1000, penult_feat=False, return_feat=False):
+    def __init__(self):
         super(reactnet, self).__init__()
         self.feature = nn.ModuleList()
-        self.penult_feat = penult_feat
-        self.return_feat = return_feat
         self.forward_syntax = suppress()
         for i in range(len(stage_out_channel)):
             if i == 0:
@@ -183,18 +181,6 @@ class reactnet(nn.Module):
             else:
                 self.feature.append(BasicBlock(stage_out_channel[i - 1], stage_out_channel[i], 1))
         self.pool1 = nn.AdaptiveAvgPool2d(1)
-        self.num_features = 1024
-
-    def change_no_grad(self):
-        self.forward_syntax = torch.no_grad()
-
-    def change_with_grad(self):
-        self.forward_syntax = suppress()
-
-    def map_2_vec(self, x):
-        x = self.pool1(x)
-        x = x.view(x.size(0), -1)
-        return x
 
     def forward(self, x):
         with self.forward_syntax:
@@ -203,22 +189,12 @@ class reactnet(nn.Module):
         feat = x
         x = self.pool1(feat)
         x = x.view(x.size(0), -1)
-        return feat, x
-
-
-class Classifier(nn.Module):
-    def __init__(self, feat_in=1024, num_classes=1000):
-        super(Classifier, self).__init__()
-        self.fc = nn.Linear(feat_in, num_classes)
-        init.kaiming_normal_(self.fc.weight)
-
-    def forward(self, x):
-        x = self.fc(x)
         return x
 
 
+
 if __name__ == '__main__':
-    model = reactnet(return_feat=True)
+    model = reactnet()
     inp = torch.randn(32, 3, 224, 224)
     out = model(inp)
     inp = torch.randn(32, 3, 480, 480)
