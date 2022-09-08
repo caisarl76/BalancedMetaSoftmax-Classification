@@ -201,7 +201,7 @@ def main():
 
     # logger.info('\n' + pprint.pformat(args))
     # logger.info('\n' + str(args))
-
+    best_acc=0
     if args.evaluate:
         print(" start evaualteion **** ")
         validate(val_loader, student_enc, student_fc, criterion_ce, logger, args)
