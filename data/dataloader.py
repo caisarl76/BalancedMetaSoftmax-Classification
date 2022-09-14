@@ -18,7 +18,7 @@ from torchvision import transforms
 import os
 from PIL import Image
 from data.ImbalanceCIFAR import IMBALANCECIFAR10, IMBALANCECIFAR100
-from custum_data.dataset import get_dataset
+from custum_data.new_dataset import get_dataset
 
 
 # Image statistics
