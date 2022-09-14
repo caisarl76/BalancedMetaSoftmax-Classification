@@ -100,10 +100,16 @@ def update(config, args):
                                                      ('lr_' + (str)(args.lr))
                                                      )
     if config['criterions']['PerformanceLoss']['def_file'] == './loss/SoftmaxLoss.py':
-        config['training_opt']['num_iterations'] = iter_dict[args.dataset]
-        config['warmup_iterations'] = math.floor(iter_dict[args.dataset] * 8 / 130)
+        if args.dataset in ['inat','places', 'imagenet']:
+            config['training_opt']['num_epochs'] = 90
+        else:
+            config['training_opt']['num_iterations'] = iter_dict[args.dataset]
+            config['warmup_iterations'] = math.floor(iter_dict[args.dataset] * 8 / 130)
     else:
-        config['training_opt']['num_iterations'] = iter_dict2[args.dataset]
+        if args.dataset in ['inat','places', 'imagenet']:
+            config['training_opt']['num_iterations'] = 10
+        else:
+            config['training_opt']['num_iterations'] = iter_dict2[args.dataset]
 
     if 'freq_path' in config['criterions']['PerformanceLoss']['loss_params']:
         config['criterions']['PerformanceLoss']['loss_params']['freq_path'] = os.path.join('cls_freq',
