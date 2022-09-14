@@ -107,7 +107,7 @@ def get_dataset(phase, data_root='./dataset', dataset='cub', sampler_dic=None, b
     # root = os.path.join(data_root, dataset)
     # print(val_transform)
 
-    if dataset in ['places', 'imagenet', 'inat']:
+    if dataset in ['places', 'imagenet', 'inat', 'iNaturalist18']:
         train_dataset = data_class(root=data_root,
                                    train=True,
                                    transform=transform_train,
