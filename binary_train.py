@@ -102,12 +102,15 @@ def update(config, args):
     if config['criterions']['PerformanceLoss']['def_file'] == './loss/SoftmaxLoss.py':
         if args.dataset in ['inat','places', 'imagenet']:
             config['training_opt']['num_epochs'] = 90
+            config['training_opt'].pop('num_iterations')
+            config.pop('warmup_iterations')
         else:
             config['training_opt']['num_iterations'] = iter_dict[args.dataset]
             config['warmup_iterations'] = math.floor(iter_dict[args.dataset] * 8 / 130)
     else:
         if args.dataset in ['inat','places', 'imagenet']:
-            config['training_opt']['num_iterations'] = 10
+            config['training_opt']['num_epochs'] = 10
+            config['training_opt'].pop('num_iterations')
         else:
             config['training_opt']['num_iterations'] = iter_dict2[args.dataset]
 
