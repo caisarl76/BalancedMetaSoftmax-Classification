@@ -37,6 +37,7 @@ class ImageNetLT(Dataset):
         self.many_shot_idx = 390
         self.median_shot_idx = 835
         self.cls_num_list = [(int)(np.sum(np.array(self.targets) == i)) for i in range(1000)]
+        print(self.cls_num_list)
 
     def get_cls_num_list(self):
         return self.cls_num_list
