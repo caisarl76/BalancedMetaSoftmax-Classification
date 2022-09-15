@@ -1,7 +1,9 @@
 import argparse
 import builtins
 import os
-
+import sys
+sys.path.append('.')
+sys.path.append('utils')
 from models import resnet_imagenet
 
 os.environ['OPENBLAS_NUM_THREADS'] = '2'
@@ -24,11 +26,10 @@ import torch.distributed as dist
 
 from custum_data.new_dataset import get_dataset
 
-from utils.utils import *
-from utils.scheduler import GradualWarmupScheduler
-from utils.BalancedSoftmaxLoss import create_loss
-from utils.feature_similarity import similarityLoss, transfer_conv
-from utils.mislas import LearnableWeightScaling
+# from utils.utils import *
+from utils import *
+from BalancedSoftmaxLoss import create_loss
+# from utils.BalancedSoftmaxLoss import create_loss
 
 from models.reactnet_imagenet import reactnet as reactnet_imagenet, Classifier
 
