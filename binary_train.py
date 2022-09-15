@@ -243,7 +243,7 @@ else:
     else:
         splits = ['train', 'val', 'test']
         test_split = 'test'
-    if 'ImageNet' == training_opt['dataset']:
+    if 'imagenet' in training_opt['dataset']:
         splits = ['train', 'val']
         test_split = 'val'
 

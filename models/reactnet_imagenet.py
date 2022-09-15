@@ -192,6 +192,15 @@ class reactnet(nn.Module):
         return x
 
 
+class Classifier(nn.Module):
+    def __init__(self, feat_in=1024, num_classes=1000):
+        super(Classifier, self).__init__()
+        self.fc = nn.Linear(feat_in, num_classes)
+        init.kaiming_normal_(self.fc.weight)
+
+    def forward(self, x):
+        x = self.fc(x)
+        return x
 
 if __name__ == '__main__':
     model = reactnet()
