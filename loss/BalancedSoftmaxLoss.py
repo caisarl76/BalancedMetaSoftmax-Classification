@@ -25,7 +25,7 @@ class BalancedSoftmax(_Loss):
     """
     def __init__(self, cls_num_list):
         super(BalancedSoftmax, self).__init__()
-        freq = torch.tensor(cls_num_list)
+        freq = torch.tensor(cls_num_list, dtype=torch.float)
         self.sample_per_class = freq
 
     def forward(self, label, input, reduction='mean'):
