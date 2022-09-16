@@ -25,10 +25,11 @@ class BalancedSoftmax(_Loss):
     """
     def __init__(self, cls_num_list):
         super(BalancedSoftmax, self).__init__()
-        freq = torch.tensor(cls_num_list, dtype=torch.float)
+        freq = torch.tensor(cls_num_list)
         self.sample_per_class = freq
 
-    def forward(self, label, input, reduction='mean'):
+    # def forward(self, label, input, reduction='mean'):
+    def forward(self, input, label, reduction='mean'):
         return balanced_softmax_loss(label, input, self.sample_per_class, reduction)
 
 
@@ -44,7 +45,7 @@ def balanced_softmax_loss(labels, logits, sample_per_class, reduction):
     """
     spc = sample_per_class.type_as(logits)
     spc = spc.unsqueeze(0).expand(logits.shape[0], -1)
-    logits = logits + spc.log()
+    logits = logits + spc.type(torch.float).log()
     loss = F.cross_entropy(input=logits, target=labels, reduction=reduction)
     return loss
 
