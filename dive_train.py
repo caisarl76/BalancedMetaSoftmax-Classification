@@ -264,7 +264,7 @@ def train(train_loader, teacher_enc, teacher_fc, student_enc, student_fc, optimi
         s_feat = student_enc(images)
         s_out, _ = student_fc(s_feat)
 
-        bsce_loss = criterion(labels, s_out)
+        bsce_loss = criterion(s_out, labels)
         s_out = F.log_softmax(s_out / args.T)
         t_out = torch.sqrt(F.log_softmax(t_out / args.T))
         t_out /= t_out.sum(dim=1, keepdim=True)
