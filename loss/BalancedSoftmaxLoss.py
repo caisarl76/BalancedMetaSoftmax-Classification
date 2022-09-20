@@ -45,7 +45,8 @@ def balanced_softmax_loss(labels, logits, sample_per_class, reduction):
     """
     spc = sample_per_class.type_as(logits)
     spc = spc.unsqueeze(0).expand(logits.shape[0], -1)
-    logits = logits + spc.type(torch.float).log()
+    # logits = logits + spc.type(torch.float).log()
+    logits = logits + spc.log()
     loss = F.cross_entropy(input=logits, target=labels, reduction=reduction)
     return loss
 
