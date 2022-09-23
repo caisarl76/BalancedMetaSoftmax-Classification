@@ -115,7 +115,7 @@ class ImbalanceCIFAR100(ImbalanceCIFAR10):
     ]
     meta = {
         'filename': 'meta',
-        'key': 'label_names',
+        'key': 'fine_label_names',
         'md5': '7973b15100ade9c7d40fb424638fde48',
     }
     cls_num = 100
