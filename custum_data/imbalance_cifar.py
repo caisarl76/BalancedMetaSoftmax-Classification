@@ -12,7 +12,7 @@ from PIL import Image
 class ImbalanceCIFAR10(torchvision.datasets.CIFAR10):
     cls_num = 10
 
-    def __init__(self, root, imb_type='exp', imb_factor=0.01, rand_number=0, train=True,
+    def __init__(self, root, imb_type='exp', imb_factor=1.0, rand_number=0, train=True,
                  transform=None, target_transform=None, download=True, random_seed=False, ra_params=None):
         super(ImbalanceCIFAR10, self).__init__(root, train, transform, target_transform, download)
         self.random_seed = random_seed

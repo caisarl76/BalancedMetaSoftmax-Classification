@@ -32,7 +32,7 @@ training_opt:
   num_iterations: 2000
   num_workers: 4
   open_threshold: 0.1
-  sampler: {def_file: ./data/MetaSampler.py, type: MetaSampler}
+  sampler: {def_file: ./data/MetaSampler.py, type: MetaSampler, meta_batch_size: 1024, init_pow: 0.1, lr: 0.001}
   scheduler_params: {gamma: 0.1, step_size: 3}
   sub_dir: models
   imb_ratio: 0.1
