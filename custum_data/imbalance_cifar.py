@@ -17,6 +17,13 @@ class ImbalanceCIFAR10(torchvision.datasets.CIFAR10):
         self.hard_aug = False
         self.sampler=sampler
         self.sampler_list=None
+        if self.cls_num == 10:
+            self.many_shot_idx = 3
+            self.median_shot_idx = 7
+        elif self.cls_num == 100:
+            self.many_shot_idx = 37
+            self.median_shot_idx = 71
+
     def get_img_num_per_cls(self, cls_num, imb_type, imb_factor):
         img_max = len(self.data) / cls_num
         img_num_per_cls = []
