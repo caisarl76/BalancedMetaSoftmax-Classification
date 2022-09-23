@@ -1,10 +1,4 @@
-import random
-
-import torch
 import torchvision
-import torchvision.transforms as transforms
-import os
-import pickle
 import numpy as np
 from PIL import Image
 
@@ -13,7 +7,7 @@ class ImbalanceCIFAR10(torchvision.datasets.CIFAR10):
     cls_num = 10
 
     def __init__(self, root, imb_type='exp', imb_factor=1.0, rand_number=0, train=True,
-                 transform=None, target_transform=None, download=True, random_seed=False, ra_params=None):
+                 transform=None, target_transform=None, download=True, random_seed=False, ra_params=None, sampler=None):
         super(ImbalanceCIFAR10, self).__init__(root, train, transform, target_transform, download)
         self.random_seed = random_seed
         self.ra_params = ra_params
@@ -21,12 +15,8 @@ class ImbalanceCIFAR10(torchvision.datasets.CIFAR10):
         img_num_list = self.get_img_num_per_cls(self.cls_num, imb_type, imb_factor)
         self.gen_imbalanced_data(img_num_list)
         self.hard_aug = False
-        if self.cls_num == 10:
-            self.many_shot_idx = 3
-            self.median_shot_idx = 7
-        elif self.cls_num == 100:
-            self.many_shot_idx = 37
-            self.median_shot_idx = 71
+        self.sampler=sampler
+        self.sampler_list=None
     def get_img_num_per_cls(self, cls_num, imb_type, imb_factor):
         img_max = len(self.data) / cls_num
         img_num_per_cls = []
@@ -91,7 +81,6 @@ class ImbalanceCIFAR10(torchvision.datasets.CIFAR10):
 
         if self.target_transform is not None:
             target = self.target_transform(target)
-
         if self.transform is not None:
             if type(self.transform) == list:
                 if type(self.transform) == list:
@@ -99,11 +88,11 @@ class ImbalanceCIFAR10(torchvision.datasets.CIFAR10):
                     for transform in self.transform:
                         sample = transform(img)
                         samples.append(sample)
-                    return samples, target, index
+                    return samples, target
 
             else:
                 sample = self.transform(img)
-                return sample, target, index
+                return sample, target
 
 class ImbalanceCIFAR100(ImbalanceCIFAR10):
     base_folder = 'cifar-100-python'
