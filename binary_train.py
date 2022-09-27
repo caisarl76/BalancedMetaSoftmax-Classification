@@ -28,6 +28,7 @@ parser.add_argument('--dataset', type=str, default='cifar100')
 parser.add_argument('--imb_ratio', type=float, default=0.1)
 parser.add_argument('--test', default=False, action='store_true')
 parser.add_argument('--batch_size', type=int, default=None)
+parser.add_argument('--num_workers', type=int, default=None)
 parser.add_argument('--test_open', default=False, action='store_true')
 parser.add_argument('--output_logits', default=False)
 parser.add_argument('--model_dir', type=str, default=None)
@@ -88,6 +89,8 @@ def update(config, args):
     config['model_dir'] = get_value(config['model_dir'], args.model_dir)
     config['training_opt']['batch_size'] = \
         get_value(config['training_opt']['batch_size'], args.batch_size)
+    config['training_opt']['num_workers'] = \
+        get_value(config['training_opt']['num_workers'], args.num_workers)
 
     config['training_opt']['dataset'] = args.dataset
     config['networks']['classifier']['params']['num_classes'] = num_class_dict[args.dataset]
@@ -202,7 +205,7 @@ if not test_mode:
         cbs_sampler_dic = None
         meta = False
     if training_opt['dataset'] in ['imagenet', 'places', 'inat']:
-        training_opt['num_workers'] = 8
+        # training_opt['num_workers'] = 8
         training_opt['imb_ratio'] = None
     data = {x: get_dataset(phase=x,
                            data_root='./dataset',
