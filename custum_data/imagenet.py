@@ -33,11 +33,10 @@ class ImageNetLT(Dataset):
             num_in_class.append(len(np.where(self.targets == class_idx)[0]))
         self.num_in_class = num_in_class
 
-        # self.sort_dataset(new_class_idx_sorted)
+        self.cls_num_list = [(int)(np.sum(np.array(self.targets) == i)) for i in range(1000)]
         self.many_shot_idx = 390
         self.median_shot_idx = 835
-        self.cls_num_list = [(int)(np.sum(np.array(self.targets) == i)) for i in range(1000)]
-        print(self.cls_num_list)
+
 
     def get_cls_num_list(self):
         return self.cls_num_list
@@ -59,7 +58,7 @@ class ImageNetLT(Dataset):
                     for transform in self.transform:
                         sample = transform(img)
                         samples.append(sample)
-                    return samples, label, index
+                    return samples, label
             else:
                 sample = self.transform(img)
 
@@ -77,21 +76,3 @@ class ImageNetLT(Dataset):
         self.targets = self.targets[idx]
         self.img_path = self.img_path[idx]
         self.new_class_idx_sorted = new_class_idx_sorted
-
-if __name__ == '__main__':
-    train_dataset = ImageNetLT('/home/vision/jihun/work/binlt/data/',train=True)
-    print(len(train_dataset))
-    print(train_dataset.get_cls_num_list()[-1])
-    tmp_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=1, shuffle=None,
-        num_workers=0, pin_memory=True, sampler=None)
-    cls_num_list = train_dataset.get_cls_num_list()
-    print('total classes:', len(cls_num_list))
-    print('max classes:', max(cls_num_list))
-    print('train loader length:', len(tmp_loader))
-    train_loader_length = len(tmp_loader)
-    oversampled_loader_length = len(cls_num_list) * max(cls_num_list)
-    dataset_ratio = train_loader_length / oversampled_loader_length
-    print('dataset ratio:', dataset_ratio)
-    print(int(dataset_ratio * 100))
-    del train_dataset
