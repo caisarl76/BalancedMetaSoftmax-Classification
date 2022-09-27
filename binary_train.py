@@ -100,8 +100,12 @@ def update(config, args):
                                                      ('lr_' + (str)(args.lr))
                                                      )
     if config['criterions']['PerformanceLoss']['def_file'] == './loss/SoftmaxLoss.py':
-        if args.dataset in ['inat','places', 'imagenet']:
+        if args.dataset in ['inat', 'imagenet']:
             config['training_opt']['num_epochs'] = 90
+            config['training_opt'].pop('num_iterations')
+            config.pop('warmup_iterations')
+        elif args.dataset == 'places':
+            config['training_opt']['num_epochs'] = 30
             config['training_opt'].pop('num_iterations')
             config.pop('warmup_iterations')
         else:
@@ -140,7 +144,10 @@ if 'cifar' in args.dataset:
 else:
     log_dir[2] = args.dataset
     if model_dir:
-        model_dir[2] = args.dataset
+        if args.dataset == 'places':
+            model_dir[2] = 'imagenet'
+        else:
+            model_dir[2] = args.dataset
 config['training_opt']['log_dir'] = '/'.join(log_dir)
 if model_dir:
     config['model_dir'] = '/'.join(model_dir)
