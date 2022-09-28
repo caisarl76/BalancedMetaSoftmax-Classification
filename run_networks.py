@@ -772,8 +772,10 @@ class model():
         print('Loading model from %s' % (model_dir))
 
         checkpoint = torch.load(model_dir)
-        model_state = checkpoint['state_dict_best']
-
+        if 'state_dict_best' in checkpoint.keys():
+            model_state = checkpoint['state_dict_best']
+        else:
+            model_state = checkpoint['state_dict']
         self.centroids = checkpoint['centroids'] if 'centroids' in checkpoint else None
 
         for key, model in self.networks.items():
