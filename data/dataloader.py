@@ -17,6 +17,7 @@ from torch.utils.data import Dataset, DataLoader, ConcatDataset
 from torchvision import transforms
 import os
 from PIL import Image
+import numpy as np
 from data.ImbalanceCIFAR import IMBALANCECIFAR10, IMBALANCECIFAR100
 from custum_data.new_dataset import get_dataset
 
