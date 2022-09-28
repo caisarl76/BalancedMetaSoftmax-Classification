@@ -137,6 +137,7 @@ def load_data(data_root, dataset, phase, batch_size, sampler_dic=None, num_worke
         set_ = IMBALANCECIFAR100(phase, imbalance_ratio=cifar_imb_ratio, root=data_root)
     elif dataset in ['iNaturalist18', 'imagenet', 'places']:
         rgb_mean, rgb_std = RGB_statistics[key]['mean'], RGB_statistics[key]['std']
+
         if phase not in ['train', 'val']:
             transform = get_data_transform('test', rgb_mean, rgb_std, key)
         else:
