@@ -152,10 +152,10 @@ if 'cifar' in args.dataset:
 else:
     log_dir[2] = args.dataset
     if model_dir:
-        if args.dataset == 'places':
-            model_dir[2] = 'imagenet'
-        else:
-            model_dir[2] = args.dataset
+        # if args.dataset == 'places':
+        #     model_dir[2] = 'imagenet'
+        # else:
+        model_dir[2] = args.dataset
 config['training_opt']['log_dir'] = '/'.join(log_dir)
 if model_dir:
     config['model_dir'] = '/'.join(model_dir)
