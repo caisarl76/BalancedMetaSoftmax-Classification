@@ -69,21 +69,21 @@ class LT_Dataset(Dataset):
 
     def __init__(self, root, txt, dataset, transform=None, meta=False):
         self.img_path = []
-        self.labels = []
+        self.targets = []
         self.transform = transform
 
         with open(txt) as f:
             for line in f:
                 self.img_path.append(os.path.join(root, line.split()[0]))
-                self.labels.append(int(line.split()[1]))
+                self.targets.append(int(line.split()[1]))
 
         # save the class frequency
         if 'train' in txt and not meta:
             if not os.path.exists('cls_freq'):
                 os.makedirs('cls_freq')
             freq_path = os.path.join('cls_freq', dataset + '.json')
-            self.img_num_per_cls = [0 for _ in range(max(self.labels) + 1)]
-            for cls in self.labels:
+            self.img_num_per_cls = [0 for _ in range(max(self.targets) + 1)]
+            for cls in self.targets:
                 self.img_num_per_cls[cls] += 1
             with open(freq_path, 'w') as fd:
                 json.dump(self.img_num_per_cls, fd)
@@ -95,12 +95,12 @@ class LT_Dataset(Dataset):
             self.median_shot_idx = 259
 
     def __len__(self):
-        return len(self.labels)
+        return len(self.targets)
 
     def __getitem__(self, index):
 
         path = self.img_path[index]
-        label = self.labels[index]
+        target = self.targets[index]
 
         with open(path, 'rb') as f:
             sample = Image.open(f).convert('RGB')
@@ -108,7 +108,7 @@ class LT_Dataset(Dataset):
         if self.transform is not None:
             sample = self.transform(sample)
 
-        return sample, label, index
+        return sample, target, index
 
 
 # Load datasets
