@@ -115,7 +115,7 @@ def update(config, args):
             config['training_opt']['num_iterations'] = iter_dict[args.dataset]
             config['warmup_iterations'] = math.floor(iter_dict[args.dataset] * 8 / 130)
     else:
-        if args.dataset in ['inat','places', 'imagenet']:
+        if args.dataset in ['inat', 'places', 'imagenet']:
             config['training_opt']['num_epochs'] = 10
             config['training_opt'].pop('num_iterations')
         else:
@@ -207,16 +207,26 @@ if not test_mode:
     if training_opt['dataset'] in ['imagenet', 'places', 'inat']:
         training_opt['num_workers'] = 8
         training_opt['imb_ratio'] = None
-    data = {x: get_dataset(phase=x,
-                           data_root='./dataset',
-                           dataset=dataset,
-                           sampler_dic=sampler_dic,
-                           batch_size=training_opt['batch_size'],
-                           num_workers=training_opt['num_workers'],
-                           imb_ratio=training_opt['imb_ratio'],
-                           )
-            for x in splits}
-    args.cls_num_list = data['train'].dataset.get_cls_num_list()
+        data_root = './dataset/'
+        data = {x: dataloader.load_data(data_root='./dataset/' ,
+                                        dataset=dataset, phase=x,
+                                        batch_size=training_opt['batch_size'],
+                                        sampler_dic=sampler_dic,
+                                        num_workers=training_opt['num_workers'],
+                                        cifar_imb_ratio=training_opt[
+                                            'cifar_imb_ratio'] if 'cifar_imb_ratio' in training_opt else None)
+                for x in splits}
+    else:
+        data = {x: get_dataset(phase=x,
+                               data_root='./dataset',
+                               dataset=dataset,
+                               sampler_dic=sampler_dic,
+                               batch_size=training_opt['batch_size'],
+                               num_workers=training_opt['num_workers'],
+                               imb_ratio=training_opt['imb_ratio'],
+                               )
+                for x in splits}
+        args.cls_num_list = data['train'].dataset.get_cls_num_list()
 
     if sampler_defs and sampler_defs['type'] == 'MetaSampler':  # todo: use meta-sampler
         cbs_file = './data/ClassAwareSampler.py'
@@ -224,15 +234,24 @@ if not test_mode:
             'sampler': source_import(cbs_file).get_sampler(),
             'params': {'is_infinite': True}
         }
-        data['meta'] = dataloader.load_data(data_root='./dataset',
-                                            dataset=dataset, phase='train' if 'CIFAR' in dataset else 'val',
-                                            batch_size=sampler_defs.get('meta_batch_size',
-                                                                        training_opt['batch_size'], ),
-                                            sampler_dic=cbs_sampler_dic,
+        if training_opt['dataset'] == 'imagenet':
+            data = {x: dataloader.load_data(data_root=data_root[dataset.rstrip('_LT')],
+                                            dataset=dataset, phase=x,
+                                            batch_size=training_opt['batch_size'],
+                                            sampler_dic=sampler_dic,
                                             num_workers=training_opt['num_workers'],
-                                            cifar_imb_ratio=training_opt[
-                                                'cifar_imb_ratio'] if 'cifar_imb_ratio' in training_opt else None,
-                                            meta=True)
+                                            cifar_imb_ratio=training_opt['cifar_imb_ratio'] if 'cifar_imb_ratio' in training_opt else None)
+                    for x in splits}
+        else:
+            data['meta'] = dataloader.load_data(data_root='./dataset',
+                                                dataset=dataset, phase='train' if 'CIFAR' in dataset else 'val',
+                                                batch_size=sampler_defs.get('meta_batch_size',
+                                                                            training_opt['batch_size'], ),
+                                                sampler_dic=cbs_sampler_dic,
+                                                num_workers=training_opt['num_workers'],
+                                                cifar_imb_ratio=training_opt[
+                                                    'cifar_imb_ratio'] if 'cifar_imb_ratio' in training_opt else None,
+                                                meta=True)
         training_model = model(config, data, test=False, meta_sample=True, learner=learner, shot_by_idx=True)
     else:
         training_model = model(config, data, test=False, shot_by_idx=True)

@@ -145,3 +145,4 @@ if __name__ == '__main__':
     # std /= len(train_loader.dataset)
     print(classes_freq)
     # print(mean, std)
+
