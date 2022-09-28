@@ -93,7 +93,9 @@ class LT_Dataset(Dataset):
         elif dataset == 'places':
             self.many_shot_idx = 131
             self.median_shot_idx = 259
-
+        self.cls_num_list = [(int)(np.sum(np.array(self.targets) == i)) for i in range(1000)]
+    def get_cls_num_list(self):
+        return self.cls_num_list
     def __len__(self):
         return len(self.targets)
 
