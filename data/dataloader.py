@@ -20,7 +20,6 @@ from PIL import Image
 from data.ImbalanceCIFAR import IMBALANCECIFAR10, IMBALANCECIFAR100
 from custum_data.new_dataset import get_dataset
 
-
 # Image statistics
 RGB_statistics = {
     'iNaturalist18': {
@@ -29,9 +28,10 @@ RGB_statistics = {
     },
     'default': {
         'mean': [0.485, 0.456, 0.406],
-        'std':[0.229, 0.224, 0.225]
+        'std': [0.229, 0.224, 0.225]
     }
 }
+
 
 # Data transformation with augmentation
 def get_data_transform(split, rgb_mean, rbg_std, key='default'):
@@ -82,11 +82,17 @@ class LT_Dataset(Dataset):
             if not os.path.exists('cls_freq'):
                 os.makedirs('cls_freq')
             freq_path = os.path.join('cls_freq', dataset + '.json')
-            self.img_num_per_cls = [0 for _ in range(max(self.labels)+1)]
+            self.img_num_per_cls = [0 for _ in range(max(self.labels) + 1)]
             for cls in self.labels:
                 self.img_num_per_cls[cls] += 1
             with open(freq_path, 'w') as fd:
                 json.dump(self.img_num_per_cls, fd)
+        if dataset == 'imagenet':
+            self.many_shot_idx = 390
+            self.median_shot_idx = 835
+        elif dataset == 'places':
+            self.many_shot_idx = 131
+            self.median_shot_idx = 259
 
     def __len__(self):
         return len(self.labels)
@@ -106,16 +112,16 @@ class LT_Dataset(Dataset):
 
 
 # Load datasets
-def load_data(data_root, dataset, phase, batch_size, sampler_dic=None, num_workers=2, test_open=False, shuffle=True, cifar_imb_ratio=None, meta=False):
+def load_data(data_root, dataset, phase, batch_size, sampler_dic=None, num_workers=2, test_open=False, shuffle=True,
+              cifar_imb_ratio=None, meta=False):
     if phase == 'train_plain':
         txt_split = 'train'
     else:
         txt_split = phase
-    txt = './data/%s/%s_%s.txt'%(dataset, dataset, txt_split)
+    txt = './dataset/%s/%s_LT_%s.txt' % (dataset, dataset, txt_split)
     # txt = './data/%s/%s_%s.txt'%(dataset, dataset, (phase if phase != 'train_plain' else 'train'))
 
     print('Loading data from %s' % (txt))
-
 
     if dataset == 'iNaturalist18':
         print('===> Loading iNaturalist18 statistics')
@@ -129,7 +135,7 @@ def load_data(data_root, dataset, phase, batch_size, sampler_dic=None, num_worke
     elif dataset == 'CIFAR100_LT':
         print('====> CIFAR100 Imbalance Ratio: ', cifar_imb_ratio)
         set_ = IMBALANCECIFAR100(phase, imbalance_ratio=cifar_imb_ratio, root=data_root)
-    elif dataset == 'iNaturalist18':
+    elif dataset in ['iNaturalist18', 'imagenet']:
         rgb_mean, rgb_std = RGB_statistics[key]['mean'], RGB_statistics[key]['std']
         if phase not in ['train', 'val']:
             transform = get_data_transform('test', rgb_mean, rgb_std, key)
@@ -137,27 +143,26 @@ def load_data(data_root, dataset, phase, batch_size, sampler_dic=None, num_worke
             transform = get_data_transform(phase, rgb_mean, rgb_std, key)
 
         print('Use data transformation:', transform)
-
+        data_root = data_root + '/' + dataset
         set_ = LT_Dataset(data_root, txt, dataset, transform, meta)
     else:
         set_ = get_dataset(data_root=data_root, dataset=dataset, phase=phase)
-
 
     print(len(set_))
 
     if sampler_dic and phase == 'train' and sampler_dic.get('batch_sampler', False):
         print('Using sampler: ', sampler_dic['sampler'])
         return DataLoader(dataset=set_,
-                           batch_sampler=sampler_dic['sampler'](set_, **sampler_dic['params']),
-                           num_workers=num_workers)
+                          batch_sampler=sampler_dic['sampler'](set_, **sampler_dic['params']),
+                          num_workers=num_workers)
 
     elif sampler_dic and (phase == 'train' or meta):
         print('Using sampler: ', sampler_dic['sampler'])
         # print('Sample %s samples per-class.' % sampler_dic['num_samples_cls'])
         print('Sampler parameters: ', sampler_dic['params'])
         return DataLoader(dataset=set_, batch_size=batch_size, shuffle=False,
-                           sampler=sampler_dic['sampler'](set_, **sampler_dic['params']),
-                           num_workers=num_workers)
+                          sampler=sampler_dic['sampler'](set_, **sampler_dic['params']),
+                          num_workers=num_workers)
     else:
         print('No sampler.')
         print('Shuffle is %s.' % (shuffle))
