@@ -108,18 +108,16 @@ def update(config, args):
             config['training_opt'].pop('num_iterations')
             config.pop('warmup_iterations')
         else:
-            config['training_opt']['num_iterations'] = iter_dict[args.dataset]
-            config['warmup_iterations'] = math.floor(iter_dict[args.dataset] * 8 / 130)
+            config['training_opt']['num_epochs'] = 180
+            config['training_opt'].pop('num_iterations')
+            config.pop('warmup_iterations')
     else:
         if args.dataset in ['inat',  'imagenet', 'places']:
             config['training_opt']['num_epochs'] = 10
             config['training_opt'].pop('num_iterations')
-        elif args.dataset == 'places':
-            config['training_opt']['num_epochs'] = 30
-            config['training_opt'].pop('num_iterations')
-            config.pop('warmup_iterations')
         else:
-            config['training_opt']['num_iterations'] = iter_dict2[args.dataset]
+            config['training_opt']['num_epochs'] = 20
+            config['training_opt'].pop('num_iterations')
 
     if 'freq_path' in config['criterions']['PerformanceLoss']['loss_params']:
         config['criterions']['PerformanceLoss']['loss_params']['freq_path'] = os.path.join('cls_freq',
