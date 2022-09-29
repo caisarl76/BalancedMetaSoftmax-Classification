@@ -121,22 +121,22 @@ def main():
     print('exp save on: ', args.root_path)
 
     dataset_info(args)
-    train_loader = dataloader.load_data(data_root='./dataset/',
-                                         dataset = args.dataset,
-                                         phase = 'train',
-                                         batch_size = args.batch_size,
-                                         num_workers = args.workers
-                                         )
-    val_loader = dataloader.load_data(data_root='./dataset/',
-                                        dataset=args.dataset,
-                                        phase='val',
-                                        batch_size=args.batch_size,
-                                        num_workers=args.workers
-                                        )
-    # train_loader = get_dataset(phase='train', data_root='./dataset', dataset=args.dataset,
-    #                             batch_size=args.batch_size, num_workers=args.workers, imb_ratio=args.imb_ratio)
-    # val_loader = get_dataset(phase='val', data_root='./dataset', dataset=args.dataset,
-    #                           batch_size=args.batch_size, num_workers=args.workers, imb_ratio=args.imb_ratio)
+    # train_loader = dataloader.load_data(data_root='./dataset/',
+    #                                      dataset = args.dataset,
+    #                                      phase = 'train',
+    #                                      batch_size = args.batch_size,
+    #                                      num_workers = args.workers
+    #                                      )
+    # val_loader = dataloader.load_data(data_root='./dataset/',
+    #                                     dataset=args.dataset,
+    #                                     phase='val',
+    #                                     batch_size=args.batch_size,
+    #                                     num_workers=args.workers
+    #                                     )
+    train_loader = get_dataset(phase='train', data_root='./dataset', dataset=args.dataset,
+                                batch_size=args.batch_size, num_workers=args.workers, imb_ratio=args.imb_ratio)
+    val_loader = get_dataset(phase='val', data_root='./dataset', dataset=args.dataset,
+                              batch_size=args.batch_size, num_workers=args.workers, imb_ratio=args.imb_ratio)
     args.num_classes = len(train_loader.dataset.get_cls_num_list())
     args.cls_num_list = train_loader.dataset.get_cls_num_list()
     if args.dataset == 'inat':
