@@ -205,7 +205,7 @@ if not test_mode:
         cbs_sampler_dic = None
         meta = False
     if training_opt['dataset'] in ['imagenet', 'places', 'inat']:
-        training_opt['num_workers'] = 8
+        training_opt['num_workers'] = 0
         training_opt['imb_ratio'] = None
         data_root = './dataset/'
         data = {x: dataloader.load_data(data_root='./dataset/' ,

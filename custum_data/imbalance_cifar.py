@@ -27,17 +27,9 @@ class ImbalanceCIFAR10(torchvision.datasets.CIFAR10):
     def get_img_num_per_cls(self, cls_num, imb_type, imb_factor):
         img_max = len(self.data) / cls_num
         img_num_per_cls = []
-        if imb_type == 'exp':
-            for cls_idx in range(cls_num):
-                num = img_max * (imb_factor ** (cls_idx / (cls_num - 1.0)))
-                img_num_per_cls.append(int(num))
-        elif imb_type == 'step':
-            for cls_idx in range(cls_num // 2):
-                img_num_per_cls.append(int(img_max))
-            for cls_idx in range(cls_num // 2):
-                img_num_per_cls.append(int(img_max * imb_factor))
-        else:
-            img_num_per_cls.extend([int(img_max)] * cls_num)
+        for cls_idx in range(cls_num):
+            num = img_max * (imb_factor ** (cls_idx / (cls_num - 1.0)))
+            img_num_per_cls.append(int(num))
         return img_num_per_cls
 
     def gen_imbalanced_data(self, img_num_per_cls):

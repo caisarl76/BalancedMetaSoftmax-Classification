@@ -155,7 +155,7 @@ def get_dataset(phase, data_root='./dataset', dataset='cub', sampler_dic=None, b
         else:
             dataset = train_dataset
         data_loader = torch.utils.data.DataLoader(
-            dataset, batch_size=batch_size, shuffle=True if phase in ['val', 'test'] else False,
+            dataset, batch_size=batch_size, shuffle=False if phase in ['val', 'test'] else True,
             num_workers=num_workers)
     return data_loader
 
