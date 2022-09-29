@@ -10,7 +10,7 @@ criterions:
 endlr: 0.0
 warmup_iterations: 800
 base_lr: 0.05
-warmup_lr: 0.1
+warmup_lr: 0.01
 last: false
 memory: {centroids: false, init_centroids: false}
 model_dir: null
