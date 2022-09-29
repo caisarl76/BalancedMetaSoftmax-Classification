@@ -115,7 +115,50 @@ class LT_Dataset(Dataset):
 
         return sample, target, index
 
+class small_LT_Dataset(Dataset):
 
+    def __init__(self, root, dataset, transform=None, meta=False):
+        self.img_path = []
+        self.targets = []
+        self.transform = transform
+
+
+        # save the class frequency
+        if 'train' in txt and not meta:
+            if not os.path.exists('cls_freq'):
+                os.makedirs('cls_freq')
+            freq_path = os.path.join('cls_freq', dataset + '.json')
+            self.img_num_per_cls = [0 for _ in range(max(self.targets) + 1)]
+            for cls in self.targets:
+                self.img_num_per_cls[cls] += 1
+            with open(freq_path, 'w') as fd:
+                json.dump(self.img_num_per_cls, fd)
+        if dataset == 'imagenet':
+            self.many_shot_idx = 390
+            self.median_shot_idx = 835
+        elif dataset == 'places':
+            self.many_shot_idx = 131
+            self.median_shot_idx = 259
+        ren = 1000 if dataset == 'imagenet' else 365
+
+        self.cls_num_list = [(int)(np.sum(np.array(self.targets) == i)) for i in range(ren)]
+    def get_cls_num_list(self):
+        return self.cls_num_list
+    def __len__(self):
+        return len(self.targets)
+
+    def __getitem__(self, index):
+
+        path = self.img_path[index]
+        target = self.targets[index]
+
+        with open(path, 'rb') as f:
+            sample = Image.open(f).convert('RGB')
+
+        if self.transform is not None:
+            sample = self.transform(sample)
+
+        return sample, target, index
 # Load datasets
 def load_data(data_root, dataset, phase, batch_size, sampler_dic=None, num_workers=2, test_open=False, shuffle=True,
               cifar_imb_ratio=None, meta=False):
