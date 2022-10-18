@@ -110,7 +110,8 @@ def update(config, args):
         else:
             config['training_opt']['num_epochs'] = 180
             config['training_opt'].pop('num_iterations')
-            config.pop('warmup_iterations')
+            if 'warmup_iteration' in config.keys():
+                config.pop('warmup_iterations')
     else:
         if args.dataset in ['inat',  'imagenet', 'places']:
             config['training_opt']['num_epochs'] = 10
