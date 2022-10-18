@@ -91,10 +91,15 @@ class LT_Dataset(Dataset):
         if dataset == 'imagenet':
             self.many_shot_idx = 390
             self.median_shot_idx = 835
+            ren=1000
         elif dataset == 'places':
             self.many_shot_idx = 131
             self.median_shot_idx = 259
-        ren = 1000 if dataset == 'imagenet' else 365
+            ren = 365
+        elif dataset == 'inat':
+            self.many_shot_idx = 842
+            self.median_shot_idx = 4543
+            ren = 8142
 
         self.cls_num_list = [(int)(np.sum(np.array(self.targets) == i)) for i in range(ren)]
     def get_cls_num_list(self):
