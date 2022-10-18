@@ -146,6 +146,11 @@ class model():
                     if 'selfatt' not in param_name and 'fc' not in param_name:
                         param.requires_grad = False
                     # print('  | ', param_name, param.requires_grad)
+            else:
+                for p_name, param in self.networks[key].named_parameters():
+                    if 'scales' in p_name:
+                        param.requires_grad = True
+
 
             if self.meta_sample and key != 'classifier':
                 # avoid adding classifier parameters to the optimizer,
@@ -155,7 +160,8 @@ class model():
             # Optimizer list
             optim_params = val['optim_params']
             if self.optim_type == 'sgd':
-                self.model_optim_params_list.append({'params': self.networks[key].parameters(),
+                parameters = filter(lambda p: p.requires_grad, self.networks[key].parameters())
+                self.model_optim_params_list.append({'params': parameters,
                                                      'lr': optim_params['lr'],
                                                      'momentum': optim_params['momentum'],
                                                      'weight_decay': optim_params['weight_decay']})
