@@ -114,7 +114,7 @@ def update(config, args):
             config['training_opt'].pop('num_iterations')
             config.pop('warmup_iterations')
     else:
-        if args.dataset in ['inat',  'imagenet', 'places']:
+        if args.dataset in ['inat', 'imagenet', 'places']:
             config['training_opt']['num_epochs'] = 10
             config['training_opt'].pop('num_iterations')
         else:
@@ -187,6 +187,11 @@ if not test_mode:
                 'sampler': source_import(sampler_defs['def_file']).get_sampler(),
                 'params': {'meta_learner': learner, 'batch_size': training_opt['batch_size']}
             }
+        elif sampler_defs['type'] == 'ClassAwareSampler':
+            sampler_dic = {
+                'sampler': source_import(sampler_defs['def_file']).get_sampler(),
+                'params': {'num_samples_cls': sampler_defs['num_samples_cls']}
+            }
     else:
         sampler_dic = None
 
@@ -208,14 +213,25 @@ if not test_mode:
         training_opt['num_workers'] = 0
         training_opt['imb_ratio'] = None
         data_root = './dataset/'
-        data = {x: dataloader.load_data(data_root='./dataset/' ,
-                                        dataset=dataset, phase=x,
-                                        batch_size=training_opt['batch_size'],
-                                        sampler_dic=sampler_dic,
-                                        num_workers=training_opt['num_workers'],
-                                        cifar_imb_ratio=training_opt[
-                                            'cifar_imb_ratio'] if 'cifar_imb_ratio' in training_opt else None)
-                for x in splits}
+        if sampler_dic:
+            data = {x: dataloader.load_data(data_root='./dataset/',
+                                            dataset=dataset, phase=x,
+                                            batch_size=training_opt['batch_size'],
+                                            sampler_dic=sampler_dic['sampler'](train_dataset,
+                                                                               **sampler_dic['params']),
+                                            num_workers=training_opt['num_workers'],
+                                            cifar_imb_ratio=training_opt[
+                                                'cifar_imb_ratio'] if 'cifar_imb_ratio' in training_opt else None)
+                    for x in splits}
+        else:
+            data = {x: dataloader.load_data(data_root='./dataset/',
+                                            dataset=dataset, phase=x,
+                                            batch_size=training_opt['batch_size'],
+                                            sampler_dic=sampler_dic,
+                                            num_workers=training_opt['num_workers'],
+                                            cifar_imb_ratio=training_opt[
+                                                'cifar_imb_ratio'] if 'cifar_imb_ratio' in training_opt else None)
+                    for x in splits}
     else:
         data = {x: get_dataset(phase=x,
                                data_root='./dataset',
@@ -240,7 +256,8 @@ if not test_mode:
                                             batch_size=training_opt['batch_size'],
                                             sampler_dic=sampler_dic,
                                             num_workers=training_opt['num_workers'],
-                                            cifar_imb_ratio=training_opt['cifar_imb_ratio'] if 'cifar_imb_ratio' in training_opt else None)
+                                            cifar_imb_ratio=training_opt[
+                                                'cifar_imb_ratio'] if 'cifar_imb_ratio' in training_opt else None)
                     for x in splits}
         else:
             data['meta'] = dataloader.load_data(data_root='./dataset',
