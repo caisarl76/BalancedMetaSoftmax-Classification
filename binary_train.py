@@ -102,17 +102,17 @@ def update(config, args):
                                                      config['optimizer'],
                                                      ('lr_' + (str)(args.lr))
                                                      )
-    if config['criterions']['PerformanceLoss']['def_file'] == './loss/SoftmaxLoss.py':
+    if config['networks']['classifier']['def_file'] == './models/TauNormClassifier.py':
+        pass
+    elif config['criterions']['PerformanceLoss']['def_file'] == './loss/SoftmaxLoss.py':
         if args.dataset in ['inat', 'imagenet', 'places']:
             config['training_opt']['num_epochs'] = 90
             config['training_opt'].pop('num_iterations')
             config.pop('warmup_iterations')
         else:
             config['training_opt']['num_epochs'] = 180
-            if 'num_iterations' in config['training_opt'].keys():
-                config['training_opt'].pop('num_iterations')
-            if 'warmup_iteration' in config.keys():
-                config.pop('warmup_iterations')
+            config['training_opt'].pop('num_iterations')
+            config.pop('warmup_iterations')
     else:
         if args.dataset in ['inat',  'imagenet', 'places']:
             config['training_opt']['num_epochs'] = 10
