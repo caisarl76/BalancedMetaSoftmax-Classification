@@ -213,25 +213,14 @@ if not test_mode:
         training_opt['num_workers'] = 0
         training_opt['imb_ratio'] = None
         data_root = './dataset/'
-        if sampler_dic:
-            data = {x: dataloader.load_data(data_root='./dataset/',
-                                            dataset=dataset, phase=x,
-                                            batch_size=training_opt['batch_size'],
-                                            sampler_dic=sampler_dic['sampler'](train_dataset,
-                                                                               **sampler_dic['params']),
-                                            num_workers=training_opt['num_workers'],
-                                            cifar_imb_ratio=training_opt[
-                                                'cifar_imb_ratio'] if 'cifar_imb_ratio' in training_opt else None)
-                    for x in splits}
-        else:
-            data = {x: dataloader.load_data(data_root='./dataset/',
-                                            dataset=dataset, phase=x,
-                                            batch_size=training_opt['batch_size'],
-                                            sampler_dic=sampler_dic,
-                                            num_workers=training_opt['num_workers'],
-                                            cifar_imb_ratio=training_opt[
-                                                'cifar_imb_ratio'] if 'cifar_imb_ratio' in training_opt else None)
-                    for x in splits}
+        data = {x: dataloader.load_data(data_root='./dataset/',
+                                        dataset=dataset, phase=x,
+                                        batch_size=training_opt['batch_size'],
+                                        sampler_dic=sampler_dic,
+                                        num_workers=training_opt['num_workers'],
+                                        cifar_imb_ratio=training_opt[
+                                            'cifar_imb_ratio'] if 'cifar_imb_ratio' in training_opt else None)
+                for x in splits}
     else:
         data = {x: get_dataset(phase=x,
                                data_root='./dataset',
