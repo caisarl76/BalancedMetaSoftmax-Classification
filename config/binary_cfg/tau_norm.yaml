@@ -13,7 +13,7 @@ model_dir: ./runs/DEFAULT/binary/softmax/adam/lr_0.01/
 networks:
   classifier:
     def_file: ./models/TauNormClassifier.py
-    optim_params: {lr: 0.1}
+    optim_params: {lr: 0.1, momentum: 0.9, weight_decay: 0.0005}
     params: {feat_dim: 1024, num_classes: 100}
   feat_model:
     def_file: ./models/reactnet.py
