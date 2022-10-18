@@ -27,16 +27,17 @@ class ImageNetLT(Dataset):
                 self.targets.append(int(line.split()[1]))
 
         self.img_path = np.array(self.img_path)
-        self.targets = np.array(self.targets)
+        # self.targets = np.array(self.targets)
         num_in_class = []
         for class_idx in np.unique(self.targets):
             num_in_class.append(len(np.where(self.targets == class_idx)[0]))
         self.num_in_class = num_in_class
-
-        self.cls_num_list = [(int)(np.sum(np.array(self.targets) == i)) for i in range(1000)]
+        self.cls_num_list = []
+        for i in range(1000):
+            self.cls_num_list.append((int)(sum(self.targets) == i))
+        # self.cls_num_list = [(int)(np.sum(np.array(self.targets) == i)) for i in range(1000)]
         self.many_shot_idx = 390
         self.median_shot_idx = 835
-
 
     def get_cls_num_list(self):
         return self.cls_num_list
@@ -76,3 +77,13 @@ class ImageNetLT(Dataset):
         self.targets = self.targets[idx]
         self.img_path = self.img_path[idx]
         self.new_class_idx_sorted = new_class_idx_sorted
+
+
+if __name__ == '__main__':
+    print(os.getcwd())
+    dataset = ImageNetLT(root='/home/vision/jihun/work/balms/dataset',
+                         txt='/home/vision/jihun/work/balms/dataset/imagenet/imagenet_LT_train.txt', train=True)
+    loader = torch.utils.data.DataLoader(dataset, batch_size=128, shuffle=True, num_workers=0, sampler=None)
+    # loader.__iter__()
+    next(iter(loader))
+    # loader.__next__()
