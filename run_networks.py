@@ -148,7 +148,7 @@ class model():
                     # print('  | ', param_name, param.requires_grad)
             else:
                 for p_name, param in self.networks[key].named_parameters():
-                    if 'scales' in p_name:
+                    if ('scales' in p_name) or ('fc' in p_name):
                         param.requires_grad = True
 
 
