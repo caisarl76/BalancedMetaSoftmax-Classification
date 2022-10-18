@@ -13,7 +13,7 @@ model_dir: ./runs/DEFAULT/binary/softmax/adam/lr_0.01/
 networks:
   classifier:
     def_file: ./models/TauNormClassifier.py
-    optim_params: {lr: 0.01}
+    optim_params: {lr: 0.1}
     params: {feat_dim: 1024, num_classes: 100}
   feat_model:
     def_file: ./models/reactnet.py
@@ -29,7 +29,7 @@ training_opt:
   feature_dim: 1024
   log_dir: ./runs/DEFAULT/clslearn/reactnet_tau_norm
   num_classes: 100
-  num_iterations: 2000
+  num_epochs: 5
   num_workers: 2
   open_threshold: 0.1
   sampler: null
