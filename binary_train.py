@@ -109,6 +109,7 @@ def update(config, args):
             config.pop('warmup_iterations')
         else:
             config['training_opt']['num_epochs'] = 180
+            if 'num_iterations' in config['training_opt'].keys():
             config['training_opt'].pop('num_iterations')
             if 'warmup_iteration' in config.keys():
                 config.pop('warmup_iterations')
