@@ -140,7 +140,7 @@ def get_dataset(phase, data_root='./dataset', dataset='cub', sampler_dic=None, b
     if sampler_dic and phase == 'train' and sampler_dic.get('batch_sampler', False):
         print('Using sampler: ', sampler_dic['sampler'])
         data_loader = torch.utils.data.DataLoader(dataset=train_dataset,
-                                                  batch_sampler=sampler_dic['sampler'](dataset,
+                                                  batch_sampler=sampler_dic['sampler'](train_dataset,
                                                                                        **sampler_dic['params']),
                                                   num_workers=num_workers)
     elif sampler_dic and phase == 'train':
