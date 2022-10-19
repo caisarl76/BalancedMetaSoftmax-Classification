@@ -65,11 +65,20 @@ def class_aware_sample_generator (cls_iter, data_iter_list, n, num_samples_cls=1
 class ClassAwareSampler (Sampler):
     
     def __init__(self, data_source, num_samples_cls=1, is_infinite=False):
-        num_classes = len(np.unique(data_source.targets))
+        if hasattr(data_source, 'targets'):
+            num_classes = len(np.unique(data_source.targets))
+            has_target = True
+        else:
+            num_classes = len(np.unique(data_source.dataset.targets))
+            has_target = False
         self.class_iter = RandomCycleIter(range(num_classes))
         cls_data_list = [list() for _ in range(num_classes)]
-        for i, label in enumerate(data_source.targets):
-            cls_data_list[label].append(i)
+        if has_target:
+            for i, label in enumerate(data_source.targets):
+                cls_data_list[label].append(i)
+        else:
+            for i, label in enumerate(data_source.dataset.targets):
+                cls_data_list[label].append(i)
         self.data_iter_list = [RandomCycleIter(x) for x in cls_data_list]
         self.num_samples = max([len(x) for x in cls_data_list]) * len(cls_data_list)
         self.num_samples_cls = num_samples_cls
