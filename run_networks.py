@@ -772,7 +772,7 @@ class model():
     def load_model(self, model_dir=None):
         model_dir = self.training_opt['log_dir'] if model_dir is None else model_dir
         if not model_dir.endswith('.pth'):
-            model_dir = os.path.join(model_dir, 'final_model_checkpoint.pth')
+            model_dir = os.path.join(model_dir, 'adam', 'lr_0.01', 'final_model_checkpoint.pth')
 
         print('Validation on the best model.')
         print('Loading model from %s' % (model_dir))
