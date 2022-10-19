@@ -3,7 +3,10 @@ coslr: true
 criterions:
   PerformanceLoss:
     def_file: ./loss/BalancedSoftmaxLoss.py
-    loss_params: {cls_num_list: []}
+    loss_params: {
+      cls_num_list: [],
+      freq_path: '',
+    }
     optim_params: null
     weight: 1.0
 endlr: 0.0
