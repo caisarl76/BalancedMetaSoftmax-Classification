@@ -122,6 +122,9 @@ def update(config, args):
         elif config['training_opt']['sampler'] is None:
             config['training_opt']['num_epochs'] = 10
             config['training_opt'].pop('num_iterations')
+        elif 'cifar' not in args.dataset:
+            config['training_opt']['num_epochs'] = 50
+            config['training_opt'].pop('num_iterations')
 
     if 'freq_path' in config['criterions']['PerformanceLoss']['loss_params']:
         config['criterions']['PerformanceLoss']['loss_params']['freq_path'] = os.path.join('cls_freq',
