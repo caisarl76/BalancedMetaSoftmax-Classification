@@ -119,7 +119,7 @@ def update(config, args):
         if args.dataset in ['inat', 'imagenet', 'places']:
             config['training_opt']['num_epochs'] = 10
             config['training_opt'].pop('num_iterations')
-        elif config['training_opt']['sampler'] is not None:
+        elif config['training_opt']['sampler'] is None:
             config['training_opt']['num_epochs'] = 10
             config['training_opt'].pop('num_iterations')
 
