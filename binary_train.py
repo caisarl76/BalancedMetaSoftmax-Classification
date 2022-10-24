@@ -119,12 +119,9 @@ def update(config, args):
         if args.dataset in ['inat', 'imagenet', 'places']:
             config['training_opt']['num_epochs'] = 10
             config['training_opt'].pop('num_iterations')
-        else:
+        elif config['training_opt']['sampler'] is not None:
+            config['training_opt']['num_epochs'] = 10
             config['training_opt'].pop('num_iterations')
-            if config['training_opt']['sampler'] is None:
-                config['training_opt']['num_epochs'] = 20
-            else:
-                config['training_opt']['num_epochs'] = 10
 
     if 'freq_path' in config['criterions']['PerformanceLoss']['loss_params']:
         config['criterions']['PerformanceLoss']['loss_params']['freq_path'] = os.path.join('cls_freq',
