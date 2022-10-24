@@ -7,11 +7,8 @@ class ImbalanceCIFAR10(torchvision.datasets.CIFAR10):
     cls_num = 10
 
     def __init__(self, root, imb_type='exp', imb_factor=1.0, rand_number=0, train=True,
-                 transform=None, target_transform=None, download=True, random_seed=False, ra_params=None, sampler=None):
+                 transform=None, target_transform=None, download=True, ra_params=None, sampler=None):
         super(ImbalanceCIFAR10, self).__init__(root, train, transform, target_transform, download)
-        self.random_seed = random_seed
-        self.ra_params = ra_params
-        np.random.seed(rand_number)
         img_num_list = self.get_img_num_per_cls(self.cls_num, imb_type, imb_factor)
         self.gen_imbalanced_data(img_num_list)
         self.hard_aug = False
@@ -23,6 +20,8 @@ class ImbalanceCIFAR10(torchvision.datasets.CIFAR10):
         elif self.cls_num == 100:
             self.many_shot_idx = 37
             self.median_shot_idx = 71
+
+        self.labels = self.targets
 
     def get_img_num_per_cls(self, cls_num, imb_type, imb_factor):
         img_max = len(self.data) / cls_num
@@ -65,6 +64,21 @@ class ImbalanceCIFAR10(torchvision.datasets.CIFAR10):
     def set_step(self, step):
         self.step = step
 
+    def get_annotations(self):
+        annos = []
+        for label in self.targets:
+            annos.append({'category_id': int(label)})
+        return annos
+
+    def _get_class_dict(self):
+        class_dict = dict()
+        for i, anno in enumerate(self.get_annotations()):
+            cat_id = anno["category_id"]
+            if not cat_id in class_dict:
+                class_dict[cat_id] = []
+            class_dict[cat_id].append(i)
+        return class_dict
+
     def __getitem__(self, index):
         """
         Args:
@@ -78,20 +92,13 @@ class ImbalanceCIFAR10(torchvision.datasets.CIFAR10):
         # to return a PIL Image
         img = Image.fromarray(img)
 
+        if self.transform is not None:
+            img = self.transform(img)
+
         if self.target_transform is not None:
             target = self.target_transform(target)
-        if self.transform is not None:
-            if type(self.transform) == list:
-                if type(self.transform) == list:
-                    samples = []
-                    for transform in self.transform:
-                        sample = transform(img)
-                        samples.append(sample)
-                    return samples, target, index
 
-            else:
-                sample = self.transform(img)
-                return sample, (int)(target), index
+        return img, (int)(target), index
 
 class ImbalanceCIFAR100(ImbalanceCIFAR10):
     base_folder = 'cifar-100-python'

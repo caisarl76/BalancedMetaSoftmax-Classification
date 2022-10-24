@@ -42,7 +42,7 @@ def get_data_transform(split, rgb_mean, rbg_std):
 
 class PlacesLT(Dataset):
 
-    def __init__(self, root, train=True, transform=None, new_class_idx_sorted=None, random_seed=False):
+    def __init__(self, root, train=True, transform=None, new_class_idx_sorted=None, random_seed=False, meta=False):
         self.random_seed = random_seed
         self.img_path = []
         self.targets = []
