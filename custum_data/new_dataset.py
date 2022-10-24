@@ -78,6 +78,8 @@ def dataset_info(args):
 def get_dataset(phase, data_root='./dataset', dataset='cub', sampler_dic=None, batch_size=128, num_workers=2,
                 imb_ratio=0.1, random_seed=None, meta=False):
     dataset = dataset.lower()
+    if 'train' not in phase:
+        imb_ratio = 1.0
     if '_' in dataset:
         dataset = dataset.split('_')[0]
     num_classes, _, _, _, MEAN, STD, data_class = class_dict[dataset]
