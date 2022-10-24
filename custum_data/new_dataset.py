@@ -76,7 +76,8 @@ def dataset_info(args):
 
 
 def get_dataset(phase, data_root='./dataset', dataset='cub', sampler_dic=None, batch_size=128, num_workers=2,
-                imb_ratio=0.1, random_seed=None):
+                imb_ratio=0.1, random_seed=None, meta=False):
+    dataset = dataset.lower()
     if '_' in dataset:
         dataset = dataset.split('_')[0]
     num_classes, _, _, _, MEAN, STD, data_class = class_dict[dataset]
@@ -111,13 +112,14 @@ def get_dataset(phase, data_root='./dataset', dataset='cub', sampler_dic=None, b
         train_dataset = data_class(root=data_root,
                                    train=True,
                                    transform=transform_train,
-                                   random_seed=random_seed)
+                                   random_seed=random_seed,
+                                   meta=meta)
     else:
         train_dataset = data_class(root=data_root,
                                    imb_factor=imb_ratio,
                                    train=True,
                                    transform=transform_train,
-                                   random_seed=random_seed, )
+                                   )
     if not os.path.exists('cls_freq'):
         os.makedirs('cls_freq')
     freq_path = os.path.join('cls_freq', dataset + '.json')
@@ -143,7 +145,11 @@ def get_dataset(phase, data_root='./dataset', dataset='cub', sampler_dic=None, b
                                                   batch_sampler=sampler_dic['sampler'](train_dataset,
                                                                                        **sampler_dic['params']),
                                                   num_workers=num_workers)
-    elif sampler_dic and phase == 'train':
+    elif phase == 'train' and not meta:
+        data_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True,
+                                                  num_workers=num_workers)
+
+    elif sampler_dic and (phase == 'train' or meta):
         print('Using sampler: ', sampler_dic['sampler'])
         print('Sampler parameters: ', sampler_dic['params'])
         data_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False,

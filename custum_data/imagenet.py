@@ -10,7 +10,7 @@ from PIL import Image
 
 class ImageNetLT(Dataset):
 
-    def __init__(self, root, txt=None, train=None, transform=None, new_class_idx_sorted=None, random_seed=False):
+    def __init__(self, root, txt=None, train=None, transform=None, new_class_idx_sorted=None, random_seed=False, meta=False):
         self.random_seed = random_seed
         self.img_path = []
         self.targets = []
