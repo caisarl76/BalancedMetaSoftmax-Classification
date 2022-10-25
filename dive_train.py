@@ -108,7 +108,7 @@ def main():
                           ('tau' + (str)(args.tau)),
                           ('alpha' + (str)(args.alpha))
                           ])
-    args.root_path = os.path.join(os.getcwd(), args.root_path, (args.dataset + (str)(args.imb_ratio)), args.mark, dive_mark)
+    args.root_path = os.path.join(os.getcwd(), args.root_path, (args.dataset + '_'+(str)(args.imb_ratio)), args.mark, dive_mark)
 
     if args.seed is not None:
         args.root_path = os.path.join(args.root_path, ('seed_' + (str)(args.seed)))
