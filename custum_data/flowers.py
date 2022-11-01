@@ -23,7 +23,6 @@ from matplotlib import pyplot as plt
 from torch.utils.data import Dataset
 from torchvision import transforms
 
-
 class Flowers(Dataset):
     def __init__(self, root, train=True, download=False, transform=None, rand_number=0, imb_factor=1, imb_type='exp', random_seed=False):
         np.random.seed(rand_number)
@@ -43,13 +42,12 @@ class Flowers(Dataset):
 
         self.samples = np.array(self.samples)
         self.targets = np.array(self.targets, dtype=np.int64)
-
+        self.many_shot_idx = 36
+        self.median_shot_idx = 72
         num_in_class = []
         for class_idx in np.unique(self.targets):
             num_in_class.append(len(np.where(self.targets == class_idx)[0]))
         self.num_in_class = num_in_class
-        self.many_shot_idx = 36
-        self.median_shot_idx = 72
         if train:
             img_num_list = self.get_img_num_per_cls(self.cls_num, imb_type, imb_factor)
             self.gen_imbalanced_data(img_num_list)
@@ -103,86 +101,5 @@ class Flowers(Dataset):
         y_label = torch.tensor(self.samples[index, 1]).long()
         image = Image.open(img_path)
         if self.transform:
-            if isinstance(self.transform, list):
-                if type(self.transform) == list:
-                    samples = []
-                    for transform in self.transform:
-                        sample = transform(image)
-                        samples.append(sample)
-                    return samples, y_label, index
-            else:
-                image = self.transform(image)
-        return (image, y_label, index)
-
-if __name__ == '__main__':
-    train_transform = transforms.Compose([
-        transforms.ToTensor(),
-    ])
-    # train_dataset = Flowers(root='/data', train=True, download=False, transform=train_transform, imb_factor=1)
-    # train_loader = torch.utils.data.DataLoader(
-    #     train_dataset, batch_size=1, shuffle=False,
-    #     num_workers=0, persistent_workers=False, pin_memory=True)
-    # for i in range(len(train_dataset.get_cls_num_list())):
-    #     images = torch.empty(train_dataset.get_cls_num_list()[0], 3, 224, 224)
-    #     idx = 0
-    #     for image, y in train_loader:
-    #         if y == i:
-    #             images[idx] = image
-    #             idx += 1
-    #
-    #     plt.figure()
-    #     plt.title(f'{i}')
-    #     plt.clf()
-    #     plt.imshow(torchvision.utils.make_grid(images, normalize=True).permute(1, 2, 0))
-    #     plt.savefig(f'Flowers_{i}.png')
-    train_dataset = Flowers('/data', train=True, download=False, transform=train_transform, imb_factor=0.1)
-    test_dataset = Flowers('/data', train=False, download=False, transform=train_transform)
-    # train_loader = torch.utils.data.DataLoader(
-    #     train_dataset, batch_size=128, shuffle=False,
-    #     num_workers=0, persistent_workers=False, pin_memory=True)
-    # for images, y in train_loader:
-    #     print(y)
-
-    train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=1, shuffle=False,
-        num_workers=0, persistent_workers=False, pin_memory=True)
-
-    test_loader = torch.utils.data.DataLoader(
-        test_dataset, batch_size=1, shuffle=False,
-        num_workers=0, persistent_workers=False, pin_memory=True)
-
-    # classes_freq = np.zeros(102)
-    # for x, y in tqdm.tqdm(train_loader):
-    #     classes_freq[np.array(y)] += 1
-    # print(classes_freq)
-
-    test_loader = torch.utils.data.DataLoader(
-        test_dataset, batch_size=1, shuffle=False,
-        num_workers=0, persistent_workers=False, pin_memory=True)
-
-    # classes_freq = np.zeros(102)
-    # for x, y in tqdm.tqdm(test_loader):
-    #     classes_freq[np.array(y)] += 1
-    # print(classes_freq)
-
-    # print(train_dataset.get_cls_num_list())
-
-    mean = 0.
-    std = 0.
-    classes_freq = np.zeros(102)
-    for images, y in train_loader:
-        batch_samples = images.size(0)  # batch size (the last batch can have smaller size!)
-        images = images.view(batch_samples, images.size(1), -1)
-        mean += images.mean(2).sum(0)
-        std += images.std(2).sum(0)
-        classes_freq[np.array(y)] += 1
-    mean /= len(train_loader.dataset)
-    std /= len(train_loader.dataset)
-    print(classes_freq)
-    print(mean, std)
-
-
-    # classes_freq = np.zeros(102)
-    # for images, y in test_loader:
-    #     classes_freq[np.array(y)] += 1
-    # print(classes_freq)
+            image = self.transform(image)
+        return image, y_label, index
