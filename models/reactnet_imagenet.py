@@ -172,7 +172,6 @@ class reactnet(nn.Module):
     def __init__(self):
         super(reactnet, self).__init__()
         self.feature = nn.ModuleList()
-        self.forward_syntax = suppress()
         for i in range(len(stage_out_channel)):
             if i == 0:
                 self.feature.append(firstconv3x3(3, stage_out_channel[i], 2))
@@ -183,9 +182,8 @@ class reactnet(nn.Module):
         self.pool1 = nn.AdaptiveAvgPool2d(1)
 
     def forward(self, x):
-        with self.forward_syntax:
-            for i, block in enumerate(self.feature):
-                x = block(x)
+        for i, block in enumerate(self.feature):
+            x = block(x)
         feat = x
         x = self.pool1(feat)
         x = x.view(x.size(0), -1)
