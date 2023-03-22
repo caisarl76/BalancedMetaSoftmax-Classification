@@ -23,12 +23,12 @@ from utils import source_import, get_value
 from custum_data.new_dataset import get_dataset
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--cfg', default=None, type=str)
+parser.add_argument('--cfg', default='./config/binary_cfg/bxnet_softmax_256adam.yaml', type=str)
 parser.add_argument('--dataset', type=str, default='cifar100')
-parser.add_argument('--imb_ratio', type=float, default=0.1)
+parser.add_argument('--imb_ratio', type=float, default=0.01)
 parser.add_argument('--test', default=False, action='store_true')
-parser.add_argument('--batch_size', type=int, default=None)
-parser.add_argument('--num_workers', type=int, default=None)
+parser.add_argument('--batch_size', type=int, default=8)
+parser.add_argument('--num_workers', type=int, default=2)
 parser.add_argument('--test_open', default=False, action='store_true')
 parser.add_argument('--output_logits', default=False)
 parser.add_argument('--model_dir', type=str, default=None)
@@ -134,6 +134,7 @@ def update(config, args):
 
 # ============================================================================
 # LOAD CONFIGURATIONS
+
 with open(args.cfg) as f:
     config = yaml.load(f)
 config = update(config, args)

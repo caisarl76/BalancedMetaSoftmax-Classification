@@ -45,6 +45,10 @@ parser.add_argument('--dist_type', type=str, default='l2')
 
 args = parser.parse_args()
 
+args.cfg = './configs/binray_cfg/bxnet_softmax_256adam.yaml'
+args.batch_size = 16
+
+
 def update(config, args):
     # Change parameters
     config['model_dir'] = get_value(config['model_dir'], args.model_dir)
