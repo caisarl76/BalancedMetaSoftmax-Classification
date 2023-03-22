@@ -454,12 +454,6 @@ class BNext(nn.Module):
         self.prelu = nn.PReLU(stage_out_channel[-1])
         self.pool1 = nn.AdaptiveAvgPool2d(1)
 
-    def change_no_grad(self):
-        self.forward_syntax = torch.no_grad()
-
-    def change_with_grad(self):
-        self.forward_syntax = suppress()
-    
     def forward(self, x):
         for i, block in enumerate(self.feature):
             x = block(x)
@@ -468,7 +462,7 @@ class BNext(nn.Module):
         x = self.pool1(x)
         x = x.view(x.size(0), -1)
 
-        return feat, x
+        return x, feat
 
 
 class Classifier(nn.Module):
