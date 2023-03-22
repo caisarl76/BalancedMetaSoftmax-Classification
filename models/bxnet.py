@@ -483,6 +483,23 @@ class Classifier(nn.Module):
         return x
 
 
+from os import path
+
+def create_model(use_fc=False, pretrain=False, dropout=None, stage1_weights=False, dataset=None, log_dir=None,
+                 test=False, *args):
+    print('Loading ReActNet encoder.')
+    model = BNext(use_fc=use_fc)
+
+    pretrained_model = "./data/checkpoints/final_model_checkpoint.pth"
+    if path.exists(pretrained_model) and pretrain:
+        print('===> Load Initialization for ResNet32')
+        model.load_model(pretrain=pretrained_model)
+    else:
+        print('===> Train backbone from the scratch')
+
+    return model
+
+
 if __name__ == "__main__":
     model = nn.DataParallel(BNext(num_classes=1000, size="large")).cpu()
     print(model.eval().cuda(0)(torch.randn(1, 3, 224, 224).cuda(0)))
