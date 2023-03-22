@@ -20,13 +20,13 @@ networks:
     optim_params: {lr: 0.01, betas: (0.9,0.999), eps: 1e-08}
     params: {feat_dim: 1024, num_classes: 100}
   feat_model:
-    def_file: ./models/bnext.py
+    def_file: ./models/bxnet.py
     fix: false
     optim_params: {lr: 0.01, betas: (0.9,0.999), eps: 1e-08}
     params: {}
 shuffle: false
 training_opt:
-  backbone: bnext
+  backbone: bxnet
   batch_size: 256
   dataset: DEFAULT
   display_step: 10
