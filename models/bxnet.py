@@ -428,7 +428,7 @@ class BasicBlock_No_Extra_Design(nn.Module):
 
 
 class BNext(nn.Module):
-    def __init__(self):
+    def __init__(self, num_classes=1000, use_fc=False):
         super(BNext, self).__init__()
         drop_rate = 0.0
         
