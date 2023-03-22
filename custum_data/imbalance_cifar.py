@@ -1,7 +1,8 @@
 import torchvision
 import numpy as np
 from PIL import Image
-
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 
 class ImbalanceCIFAR10(torchvision.datasets.CIFAR10):
     cls_num = 10
