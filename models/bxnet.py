@@ -461,9 +461,8 @@ class BNext(nn.Module):
         self.forward_syntax = suppress()
     
     def forward(self, x):
-        with self.forward_syntax:
-            for i, block in enumerate(self.feature):
-                x = block(x)
+        for i, block in enumerate(self.feature):
+            x = block(x)
         feat = x
         x = self.prelu(feat)
         x = self.pool1(x)
