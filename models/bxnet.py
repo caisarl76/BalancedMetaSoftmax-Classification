@@ -7,7 +7,7 @@ import torch.nn.functional as F
 import torch.nn.init as init
 import numpy as np
 from einops import rearrange
-from timm.models.layers import trunc_normal_, DropPath
+# from timm.models.layers import trunc_normal_, DropPath
 
 
 #stage ratio: 1:1:3:1
