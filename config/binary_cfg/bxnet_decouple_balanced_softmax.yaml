@@ -1,19 +1,15 @@
 optimizer: adam
-coslr: True
-coslrwarmup: true
+coslr: true
 criterions:
   PerformanceLoss:
-    def_file: ./loss/SoftmaxLoss.py
-    loss_params: {}
+    def_file: ./loss/BalancedSoftmaxLoss.py
+    loss_params: {freq_path: None}
     optim_params: null
     weight: 1.0
 endlr: 0.0
-warmup_iterations: 800
-base_lr: 0.05
-warmup_lr: 0.01
 last: false
 memory: {centroids: false, init_centroids: false}
-model_dir: null
+model_dir: ./runs/DEFAULT/binary/softmax/adam/lr_0.01/
 networks:
   classifier:
     def_file: ./models/DotProductClassifier.py
@@ -21,7 +17,7 @@ networks:
     params: {feat_dim: 1024, num_classes: 100}
   feat_model:
     def_file: ./models/bxnet.py
-    fix: false
+    fix: true
     optim_params: {lr: 0.01, betas: (0.9,0.999), eps: 1e-08}
     params: {}
 shuffle: false
@@ -31,12 +27,12 @@ training_opt:
   dataset: DEFAULT
   display_step: 10
   feature_dim: 1024
-  log_dir: ./runs/DEFAULT/binary/bxnet_softmax
+  log_dir: ./runs/DEFAULT/clslearn/bxnet_decouple_balanced_softmax
   num_classes: 100
-  num_iterations: 13000
+  num_iterations: 2000
   num_workers: 2
   open_threshold: 0.1
-  sampler: null
+  sampler: {def_file: ./data/MetaSampler.py, type: MetaSampler, meta_batch_size: 1024, init_pow: 0.1, lr: 0.001}
   scheduler_params: {gamma: 0.1, step_size: 3}
   sub_dir: models
   imb_ratio: 0.1
