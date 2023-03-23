@@ -16,18 +16,18 @@ networks:
     optim_params: {lr: 0.1, momentum: 0.9, weight_decay: 0.0005}
     params: {feat_dim: 1024, num_classes: 100}
   feat_model:
-    def_file: ./models/reactnet.py
+    def_file: ./models/bxnet.py
     fix: true
     optim_params: {lr: 0.1, momentum: 0.9, weight_decay: 0.0005}
     params: {}
 shuffle: false
 training_opt:
-  backbone: reactnet
+  backbone: bxnet
   batch_size: 256
   dataset: DEFAULT
   display_step: 10
   feature_dim: 1024
-  log_dir: ./runs/DEFAULT/clslearn/reactnet_tau_norm
+  log_dir: ./runs/DEFAULT/clslearn/bxnet_tau_norm
   num_classes: 100
   num_epochs: 5
   num_workers: 2
