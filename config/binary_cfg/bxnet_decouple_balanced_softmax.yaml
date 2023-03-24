@@ -23,7 +23,7 @@ networks:
 shuffle: false
 training_opt:
   backbone: bxnet
-  batch_size: 256
+  batch_size: 128
   dataset: DEFAULT
   display_step: 10
   feature_dim: 1024
