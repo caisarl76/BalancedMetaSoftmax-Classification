@@ -105,17 +105,13 @@ class Aircraft(VisionDataset):
         path, target = self.samples[index]
         img = self.loader(path)
         target = torch.tensor(int(target)).long()
+
         if self.transform is not None:
-            if type(self.transform) == list:
-                samples = []
-                for transform in self.transform:
-                    sample = transform(img)
-                    samples.append(sample)
-                return samples, target, index
-            else:
-                sample = self.transform(img)
+            sample = self.transform(img)
+
         if self.target_transform is not None:
             target = self.target_transform(target)
+
         return sample, target, index
 
     def __len__(self):
