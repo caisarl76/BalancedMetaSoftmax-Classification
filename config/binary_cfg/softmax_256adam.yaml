@@ -17,12 +17,12 @@ model_dir: null
 networks:
   classifier:
     def_file: ./models/DotProductClassifier.py
-    optim_params: {lr: 0.01, betas: (0.9,0.999), eps: 1e-08}
+    optim_params: {lr: 0.01}
     params: {feat_dim: 1024, num_classes: 100}
   feat_model:
     def_file: ./models/reactnet.py
     fix: false
-    optim_params: {lr: 0.01, betas: (0.9,0.999), eps: 1e-08}
+    optim_params: {lr: 0.01}
     params: {}
 shuffle: false
 training_opt:

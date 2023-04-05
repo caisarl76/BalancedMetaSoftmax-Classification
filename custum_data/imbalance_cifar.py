@@ -10,6 +10,9 @@ class ImbalanceCIFAR10(torchvision.datasets.CIFAR10):
     def __init__(self, root, imb_type='exp', imb_factor=1.0, rand_number=0, train=True,
                  transform=None, target_transform=None, download=True, ra_params=None, sampler=None):
         super(ImbalanceCIFAR10, self).__init__(root, train, transform, target_transform, download)
+        if not train:
+            imb_factor=1.0
+
         img_num_list = self.get_img_num_per_cls(self.cls_num, imb_type, imb_factor)
         self.gen_imbalanced_data(img_num_list)
         self.hard_aug = False

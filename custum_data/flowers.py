@@ -42,8 +42,7 @@ class Flowers(Dataset):
 
         self.samples = np.array(self.samples)
         self.targets = np.array(self.targets, dtype=np.int64)
-        self.many_shot_idx = 36
-        self.median_shot_idx = 72
+
         num_in_class = []
         for class_idx in np.unique(self.targets):
             num_in_class.append(len(np.where(self.targets == class_idx)[0]))
@@ -51,6 +50,8 @@ class Flowers(Dataset):
         if train:
             img_num_list = self.get_img_num_per_cls(self.cls_num, imb_type, imb_factor)
             self.gen_imbalanced_data(img_num_list)
+        self.many_shot_idx = 36
+        self.median_shot_idx = 72
 
     def get_img_num_per_cls(self, cls_num, imb_type, imb_factor):
         img_max = len(self.samples) / cls_num
