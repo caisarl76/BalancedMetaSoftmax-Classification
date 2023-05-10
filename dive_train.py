@@ -170,11 +170,15 @@ def main():
     new_enc_dict = {}
     new_fc_dict = {}
     for key in enc_state_dict.keys():
-        if key.strip('module.') in teacher_enc.state_dict():
-            new_enc_dict[key.strip('module.')] = enc_state_dict[key]
+        if 'fc' in key:
+            pass
+        elif key.startswith('module.'):
+            new_key = key.replace('module.','')
+            new_enc_dict[new_key] = enc_state_dict[key]
     for key in fc_state_dict.keys():
-        if key.strip('module.') in teacher_fc.state_dict():
-            new_fc_dict[key.strip('module.')] = fc_state_dict[key]
+        if key.startswith('module.'):
+            new_key = key.replace('module.','')
+            new_fc_dict[new_key] = fc_state_dict[key]
 
     teacher_enc.load_state_dict(new_enc_dict)
     teacher_fc.load_state_dict(new_fc_dict)
