@@ -9,3 +9,4 @@ runs
 dataset
 sh/
 cls_freq/
+.DS_store
