@@ -428,10 +428,10 @@ class BasicBlock_No_Extra_Design(nn.Module):
 
 
 class BNext(nn.Module):
-    def __init__(self, num_classes=1000, use_fc=False):
+    def __init__(self, num_classes=1000, return_feat=True):
         super(BNext, self).__init__()
         drop_rate = 0.0
-        
+        self.return_feat = return_feat
         stage_out_channel = stage_out_channel_tiny
         self.num_features = stage_out_channel[-1]
         
@@ -461,8 +461,10 @@ class BNext(nn.Module):
         x = self.prelu(feat)
         x = self.pool1(x)
         x = x.view(x.size(0), -1)
-
-        return x, feat
+        if self.return_feat:
+            return x, feat
+        else:
+            return x
 
 
 class Classifier(nn.Module):
