@@ -154,9 +154,9 @@ def main():
         student_enc = reactnet()
         student_fc = DotProduct_Classifier(num_classes=args.num_classes, feat_dim=1024)
     elif args.arch == 'bxnet':
-        teacher_enc = BNext()
+        teacher_enc = BNext(return_feat=False)
         teacher_fc = DotProduct_Classifier(num_classes=args.num_classes, feat_dim=1024)
-        student_enc = BNext()
+        student_enc = BNext(return_feat=False)
         student_fc = DotProduct_Classifier(num_classes=args.num_classes, feat_dim=1024)
 
     args.teacher_path = os.path.join(os.getcwd(), args.teacher_path)
