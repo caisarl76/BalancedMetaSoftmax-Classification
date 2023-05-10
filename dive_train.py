@@ -22,10 +22,12 @@ from loss.BalancedSoftmaxLoss import create_loss_w_list
 
 from utils import AverageMeter, ProgressMeter, accuracy
 from models.reactnet_imagenet import reactnet
+from models.bxnet import BNext
 from models.DotProductClassifier import DotProduct_Classifier
 
 Dataloader = None
 parser = argparse.ArgumentParser()
+parser.add_argument('--arch', type=str, default='reactnet')
 parser.add_argument('--dataset', default='caltech101')
 parser.add_argument('--data', metavar='DIR', default='./data/')
 parser.add_argument('--root_path', type=str, default='./runs/runs/dive/diveTtobinary')
@@ -100,10 +102,12 @@ def main():
     else:
         args.imb_ratio = 0.1
 
-    args.mark = '_'.join([('epochs' + (str)(args.epochs)),
-                          ('bs' + (str)(args.batch_size)),
-                          ('lr' + (str)(args.lr)),
-                          ])
+    args.mark = '_'.join([
+        args.arch,
+        ('epochs' + (str)(args.epochs)),
+        ('bs' + (str)(args.batch_size)),
+        ('lr' + (str)(args.lr)),
+        ])
     dive_mark = '_'.join([('Temp' + (str)(args.T)),
                           ('tau' + (str)(args.tau)),
                           ('alpha' + (str)(args.alpha))
@@ -144,10 +148,16 @@ def main():
     else:
         args.cls_num_list = train_loader.dataset.get_cls_num_list()
 
-    teacher_enc = reactnet()
-    teacher_fc = DotProduct_Classifier(num_classes=args.num_classes, feat_dim=1024)
-    student_enc = reactnet()
-    student_fc = DotProduct_Classifier(num_classes=args.num_classes, feat_dim=1024)
+    if args.arch == 'reactnet':
+        teacher_enc = reactnet()
+        teacher_fc = DotProduct_Classifier(num_classes=args.num_classes, feat_dim=1024)
+        student_enc = reactnet()
+        student_fc = DotProduct_Classifier(num_classes=args.num_classes, feat_dim=1024)
+    elif args.arch == 'bxnet':
+        teacher_enc = BNext()
+        teacher_fc = DotProduct_Classifier(num_classes=args.num_classes, feat_dim=1024)
+        student_enc = BNext()
+        student_fc = DotProduct_Classifier(num_classes=args.num_classes, feat_dim=1024)
 
     args.teacher_path = os.path.join(os.getcwd(), args.teacher_path)
     print(args.teacher_path)
