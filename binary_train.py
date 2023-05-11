@@ -88,6 +88,7 @@ iter_dict2 = {
 
 def update(config, args):
     # Change parameters
+    config['training_opt']['imb_ratio'] = args.imb_ratio
     config['model_dir'] = get_value(config['model_dir'], args.model_dir)
     config['training_opt']['batch_size'] = \
         get_value(config['training_opt']['batch_size'], args.batch_size)
@@ -270,7 +271,7 @@ if not test_mode:
                                                 meta=True)
         else:
             data['meta'] = get_dataset(data_root='./dataset',
-                                       dataset=dataset, phase='train' if 'CIFAR' in dataset else 'val',
+                                       dataset=dataset, phase='train',
                                        batch_size=sampler_defs.get('meta_batch_size',
                                                                    training_opt['batch_size'], ),
                                        sampler_dic=cbs_sampler_dic,
