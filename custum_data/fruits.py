@@ -22,7 +22,6 @@ class Fruits(VisionDataset):
         else:
             root = os.path.join(root, 'Test')
             imb_factor = 1.0
-
         super(Fruits, self).__init__(root, transform=transform,
                                             target_transform=target_transform)
         classes, class_to_idx = self._find_classes(self.root)
@@ -59,7 +58,6 @@ class Fruits(VisionDataset):
         if train:
             img_num_list = self.get_img_num_per_cls(self.cls_num, imb_type, imb_factor)
             self.gen_imbalanced_data(img_num_list)
-        print(len(self.targets) ,self.cls_num, imb_type, imb_factor)
 
     def sort_dataset(self, new_class_idx_sorted=None):
         idx = np.argsort(self.targets)

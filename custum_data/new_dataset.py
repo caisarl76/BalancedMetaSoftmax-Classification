@@ -79,7 +79,6 @@ def get_dataset(phase, data_root='./dataset', dataset='cub', sampler_dic=None, b
                 imb_ratio=0.1, random_seed=None, meta=False):
     dataset = dataset.lower()
     if phase not in ['meta', 'train', 'train_plain']:
-    # if 'train' not in phase:
         imb_ratio = 1.0
     if '_' in dataset:
         dataset = dataset.split('_')[0]

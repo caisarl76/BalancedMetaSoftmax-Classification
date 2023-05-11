@@ -10,4 +10,7 @@ dataset
 sh/
 cls_freq/
 .DS_store
+<<<<<<< HEAD
 *.zip
+=======
+>>>>>>> a9459c70b812ca320c0cc32bf759a49fd474ffa1
