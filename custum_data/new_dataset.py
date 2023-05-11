@@ -200,8 +200,6 @@ if __name__ == '__main__':
             print('dataset ratio:', dataset_ratio)
             print(int(dataset_ratio * 100))
             del train_dataset, val_dataset
-    from utils.mislas import ClassAwareSampler
-    from collections import Counter
 
     # train_dataset, val_dataset = get_dataset(args, train_img_size=(480, 224, 128), random_seed=True)
     #

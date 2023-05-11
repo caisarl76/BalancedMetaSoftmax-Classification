@@ -272,7 +272,6 @@ if not test_mode:
         else:
             data['meta'] = get_dataset(data_root='./dataset',
                                        dataset=dataset, phase='train',
-                                       dataset=dataset, phase='train' if 'CIFAR' in dataset else 'val',
                                        batch_size=sampler_defs.get('meta_batch_size',
                                                                    training_opt['batch_size'], ),
                                        sampler_dic=cbs_sampler_dic,
